@@ -38,6 +38,5 @@ public class RememberbrallIt extends AbstractTestNGSpringContextTests {
                 .body("[0].entryName", both(instanceOf(String.class)).and(not("")))
                 .body("[0].entryCateory", both(instanceOf(String.class)).and(not("")))
                 .body("[0].entryUrl", both(instanceOf(String.class)).and(not("")));
-
     }
 }
