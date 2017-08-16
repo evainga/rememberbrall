@@ -1,0 +1,31 @@
+:docinfo:
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:highlightjs-theme: googlecode
+:sectlinks:
+:linkattrs:
+
+= API documentation of Rememberbrall
+
+This artifact holds integration tests for Rememberbrall and generates living documentation from them.
+This is done with https://github.com/rest-assured/rest-assured[Rest Assured] and http://projects.spring.io/spring-restdocs[Spring REST Docs].
+
+In the next chapters, different Controllers with their endpoints of Rememberbrall are being documented with their respective request and response semantics.
+
+== Get all entries
+
+This endpoint (currently implemented in `de.rememberbrall.RememberbrallController`) provides all entries of Rememberbrall.
+
+You can call it manually via
+include::{snippets}/show-entries/curl-request.adoc[]
+
+The request looks like
+include::{snippets}/show-entries/http-request.adoc[]
+
+The response looks like
+include::{snippets}/show-entries/http-response.adoc[]
+
+…and has the following detailed semantics…
+include::{snippets}/show-entries/response-fields.adoc[]
+
