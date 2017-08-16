@@ -14,6 +14,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -23,20 +24,21 @@ public class RememberbrallIT extends AbstractTestNGSpringContextTests {
     int port;
 
     public RequestSpecification getPlainRequestSpec() {
-        return new RequestSpecBuilder().build().baseUri("http://localhost/rememberbrall").port(port);
+        return new RequestSpecBuilder().build().baseUri("http://localhost").port(port);
     }
 
     @Test
     public void showAllEntries() {
         given(getPlainRequestSpec())
-                .when().log().all()
+                .accept(ContentType.JSON)
+                .when()
                 .get("entries")
                 .then()
                 .statusCode(200)
                 .body("$", hasSize(greaterThan(0)))
-                .body("[0].entrytId", both(instanceOf(String.class)).and(not("")))
+                .body("[0].entryId", both(instanceOf(String.class)).and(not("")))
                 .body("[0].entryName", both(instanceOf(String.class)).and(not("")))
-                .body("[0].entryCateory", both(instanceOf(String.class)).and(not("")))
+                .body("[0].entryCategory", both(instanceOf(String.class)).and(not("")))
                 .body("[0].entryUrl", both(instanceOf(String.class)).and(not("")));
     }
 }
