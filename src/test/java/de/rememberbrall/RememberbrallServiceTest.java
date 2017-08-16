@@ -21,13 +21,13 @@ public class RememberbrallServiceTest {
     }
 
     @Test
-    public void getAllEntrys() {
-        assertThat(rememberbrallService.getAllEntrys()).hasAtLeastOneElementOfType(Entry.class);
+    public void getAllEntries() {
+        assertThat(rememberbrallService.getAllEntries()).hasAtLeastOneElementOfType(Entry.class);
     }
 
     @Test
     public void getFirstEntry() {
-        List<Entry> allEvents = rememberbrallService.getAllEntrys();
+        List<Entry> allEvents = rememberbrallService.getAllEntries();
         assertThat(allEvents.get(0).getEntryId()).isInstanceOf(UUID.class);
         assertThat(allEvents.get(0).getEntryName()).isInstanceOf(String.class);
         assertThat(allEvents.get(0).getEntryCategory()).isInstanceOf(EntryCategory.class);
@@ -43,7 +43,7 @@ public class RememberbrallServiceTest {
 
         assertThat(existingEntry.get()).isEqualTo(entry);
         assertThat(nonExistingEntry).isNotIn(rememberbrallService); // ask Marco if possible?
-        assertThat(nonExistingEntry).isEmpty();
+        assertThat(nonExistingEntry).isEqualTo(Optional.empty());
     }
 
     @Test
@@ -53,10 +53,10 @@ public class RememberbrallServiceTest {
                 EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
 
         UUID newUuid = rememberbrallService.createEntry(testEntry);
-        List<Entry> allEntrys = rememberbrallService.getAllEntrys();
+        List<Entry> allEntries = rememberbrallService.getAllEntries();
 
         assertThat(newUuid).isNotNull();
-        assertThat(allEntrys).contains(testEntry);
+        assertThat(allEntries).contains(testEntry);
 
     }
 

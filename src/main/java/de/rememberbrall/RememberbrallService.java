@@ -34,7 +34,7 @@ public class RememberbrallService {
         entryDb.add(mocksNotStubs);
     }
 
-    public List<Entry> getAllEntrys() {
+    public List<Entry> getAllEntries() {
         return entryDb;
 
     }

@@ -17,7 +17,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-public class RememberbrallIt extends AbstractTestNGSpringContextTests {
+public class RememberbrallIT extends AbstractTestNGSpringContextTests {
 
     @Value("${local.server.port}")
     int port;
@@ -27,10 +27,10 @@ public class RememberbrallIt extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void showAllEntrys() {
+    public void showAllEntries() {
         given(getPlainRequestSpec())
-                .when()
-                .get("entrys")
+                .when().log().all()
+                .get("entries")
                 .then()
                 .statusCode(200)
                 .body("$", hasSize(greaterThan(0)))
