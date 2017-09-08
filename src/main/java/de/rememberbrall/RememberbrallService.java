@@ -48,7 +48,6 @@ public class RememberbrallService {
         newEntry.setEntryId(uuid);
         entryDb.add(newEntry);
         return uuid;
-
     }
 
     public boolean deleteEntry(UUID uuid) {
