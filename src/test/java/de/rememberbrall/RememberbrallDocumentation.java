@@ -8,9 +8,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
@@ -74,34 +76,48 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
     @Test
     public void showSpecificEntry() {
         given(getPlainRequestSpec())
+                .filter(document("show-specific-entry",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(fieldWithPath("entryId").description("The UUID of an entry"),
+                                fieldWithPath("entryName").description("The given name of the entry"),
+                                fieldWithPath("entryCategory").description("The given name of the entry"),
+                                fieldWithPath("entryUrl").description("The given name of the entry"))))
+                .accept(ContentType.JSON)
                 .when()
-                .pathParam("uuid", UUID.fromString("00000000-0000-0000-0000-000000000002"))
-                .get("entries/{uuid}")
+                .get("entries/{uuid}", UUID.fromString("00000000-0000-0000-0000-000000000002"))
                 .then()
                 .statusCode(200)
                 .body("entryId", is("00000000-0000-0000-0000-000000000002"))
-                .body("entryName", is("4 Techniques for Writing better Java"));
+                .body("entryName", is("4 Techniques for Writing better Java"))
+                .body("entryCategory", is("JAVA"))
+                .body("entryUrl", is("https://dzone.com/articles/4-techniques-for-writing-better-java"));
     }
 
     @Test
     public void createEntry() throws MalformedURLException {
         given(getPlainRequestSpec())
+                .filter(document("create-entry",
+                        preprocessRequest(prettyPrint()),
+                        requestFields(fieldWithPath("entryId").description("The UUID of an entry"),
+                                fieldWithPath("entryName").description("The given name of the entry"),
+                                fieldWithPath("entryCategory").description("The given name of the entry"),
+                                fieldWithPath("entryUrl").description("The given name of the entry"))))
                 .when()
-                .body(new Entry("LINUX",
-                        EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)")))
+                .body(new Entry("LINUX", EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)")))
                 .contentType(ContentType.JSON)
                 .post("entries")
                 .then()
                 .statusCode(201)
                 .header(HttpHeaders.LOCATION, not(empty()));
+
     }
 
     @Test
     public void deleteNonExistingEntry() {
         given(getPlainRequestSpec())
+                .filter(document("delete-non-existing-entry"))
                 .when()
-                .pathParam("uuid", UUID.fromString("00000000-0000-0000-0000-000000000404"))
-                .get("entries/{uuid}")
+                .get("entries/{uuid}", UUID.fromString("00000000-0000-0000-0000-000000000404"))
                 .then()
                 .statusCode(404);
     }
@@ -110,8 +126,7 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
     public void deleteNewlyCreatedEntry() throws MalformedURLException {
         String uuid = given(getPlainRequestSpec())
                 .when()
-                .body(new Entry("LINUX",
-                        EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)")))
+                .body(new Entry("LINUX", EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)")))
                 .contentType(ContentType.JSON)
                 .post("entries")
                 .then()
@@ -120,9 +135,9 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
                 .header(HttpHeaders.LOCATION);
 
         given(getPlainRequestSpec())
+                .filter(document("delete-newly-created-entry"))
                 .when()
-                .pathParam("uuid", uuid)
-                .delete("entries/{uuid}")
+                .delete("entries/{uuid}", uuid)
                 .then()
                 .statusCode(204);
     }
