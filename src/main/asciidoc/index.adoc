@@ -20,49 +20,18 @@ This is done with https://github.com/rest-assured/rest-assured[Rest Assured] and
 
 This endpoint provides all entries of Rememberbrall.
 
-You can call it manually via:
-include::{snippets}/show-entries/curl-request.adoc[]
-
-The request looks like:
-include::{snippets}/show-entries/http-request.adoc[]
-
-The response looks like:
-include::{snippets}/show-entries/http-response.adoc[]
-
-...and has the following detailed semantics:
-include::{snippets}/show-entries/response-fields.adoc[]
+operation::show-entries[snippets='curl-request,http-request,http-response,response-fields']
 
 == Get a specific entry
 
 This endpoint gets a specific entry of Rememberbrall. 
 
-You can call it manually via:
-include::{snippets}/show-specific-entry/curl-request.adoc[]
-
-The request looks like:
-include::{snippets}/show-specific-entry/http-request.adoc[]
-
-The response looks like:
-include::{snippets}/show-specific-entry/http-response.adoc[]
-
-…and has the following detailed semantics:
-include::{snippets}/show-specific-entry/response-fields.adoc[]
+operation::show-specific-entry[snippets='curl-request,http-request,http-response,response-fields'] 
 
 == Create an entry
 This endpoint creates an entry to Rememberbrall.
 
-You can call it manually via:
-include::{snippets}/create-entry/curl-request.adoc[]
-
-The request looks like:
-include::{snippets}/create-entry/http-request.adoc[]
-
-…and has the following detailed semantics:
-include::{snippets}/create-entry/request-fields.adoc[]
-
-The response looks like:
-include::{snippets}/create-entry/http-response.adoc[]
-
+operation::create-entry[snippets='curl-request,http-request,request-fields,http-response']
 
 == Delete an entry
 
@@ -70,24 +39,11 @@ This endpoint deletes an entry from Rememberbrall.
 
 === Delete a non-existing entry
 
-You can call it manually via:
-include::{snippets}/delete-non-existing-entry/curl-request.adoc[]
+operation::delete-non-existing-entry[snippets='curl-request,http-request,http-response']
 
-The request looks like:
-include::{snippets}/delete-non-existing-entry/http-request.adoc[]
-
-The response looks like:
-include::{snippets}/delete-non-existing-entry/http-response.adoc[]
 
 
 === Delete a newly created entry
 
-You can call it manually via:
-include::{snippets}/delete-newly-created-entry/curl-request.adoc[]
-
-The request looks like:
-include::{snippets}/delete-newly-created-entry/http-request.adoc[]
-
-The response looks like:
-include::{snippets}/delete-newly-created-entry/http-response.adoc[]
+operation::delete-newly-created-entry[snippets='curl-request,http-request,http-response']
 
