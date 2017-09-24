@@ -3,29 +3,91 @@
 :icons: font
 :source-highlighter: highlightjs
 :highlightjs-theme: googlecode
+:toc: left
 :sectlinks:
 :linkattrs:
+:hide-uri-scheme:
 
 = API documentation of Rememberbrall
+Eva Göttert
 
-This artifact holds integration tests for Rememberbrall and generates living documentation from them.
+This artifact holds integration tests for Rememberbrall and generates living documentation from this programme. In the next chapters, `de.rememberbrall.RememberbrallController` is being documented with its respective request and response semantics.
+
 This is done with https://github.com/rest-assured/rest-assured[Rest Assured] and http://projects.spring.io/spring-restdocs[Spring REST Docs].
 
-In the next chapters, different Controllers with their endpoints of Rememberbrall are being documented with their respective request and response semantics.
 
 == Get all entries
 
-This endpoint (currently implemented in `de.rememberbrall.RememberbrallController`) provides all entries of Rememberbrall.
+This endpoint provides all entries of Rememberbrall.
 
-You can call it manually via
+You can call it manually via:
 include::{snippets}/show-entries/curl-request.adoc[]
 
-The request looks like
+The request looks like:
 include::{snippets}/show-entries/http-request.adoc[]
 
-The response looks like
+The response looks like:
 include::{snippets}/show-entries/http-response.adoc[]
 
-…and has the following detailed semantics…
+...and has the following detailed semantics:
 include::{snippets}/show-entries/response-fields.adoc[]
+
+== Get a specific entry
+
+This endpoint gets a specific entry of Rememberbrall. 
+
+You can call it manually via:
+include::{snippets}/show-specific-entry/curl-request.adoc[]
+
+The request looks like:
+include::{snippets}/show-specific-entry/http-request.adoc[]
+
+The response looks like:
+include::{snippets}/show-specific-entry/http-response.adoc[]
+
+…and has the following detailed semantics:
+include::{snippets}/show-specific-entry/response-fields.adoc[]
+
+== Create an entry
+This endpoint creates an entry to Rememberbrall.
+
+You can call it manually via:
+include::{snippets}/create-entry/curl-request.adoc[]
+
+The request looks like:
+include::{snippets}/create-entry/http-request.adoc[]
+
+…and has the following detailed semantics:
+include::{snippets}/create-entry/request-fields.adoc[]
+
+The response looks like:
+include::{snippets}/create-entry/http-response.adoc[]
+
+
+== Delete an entry
+
+This endpoint deletes an entry from Rememberbrall.
+
+=== Delete a non-existing entry
+
+You can call it manually via:
+include::{snippets}/delete-non-existing-entry/curl-request.adoc[]
+
+The request looks like:
+include::{snippets}/delete-non-existing-entry/http-request.adoc[]
+
+The response looks like:
+include::{snippets}/delete-non-existing-entry/http-response.adoc[]
+
+
+=== Delete a newly created entry
+
+You can call it manually via:
+include::{snippets}/delete-newly-created-entry/curl-request.adoc[]
+
+The request looks like:
+include::{snippets}/delete-newly-created-entry/http-request.adoc[]
+
+The response looks like:
+include::{snippets}/delete-newly-created-entry/http-response.adoc[]
 
