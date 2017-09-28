@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +25,8 @@ public class RememberbrallControllerTest {
     private RememberbrallService rememberbrallService;
     @Mock
     private Entry entry;
+
+    private static final UUID UUID_EXAMPLE = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @BeforeTest
     public void initMocks() {
@@ -49,12 +50,10 @@ public class RememberbrallControllerTest {
     @Test
     public void showSpecificExistingEntry() throws MalformedURLException {
         //given
-        UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000001");
-        Entry entry = new Entry(uuid, "name", EntryCategory.ENTWICKLUNG, new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-        when(rememberbrallService.getEntryByUUID(uuid)).thenReturn(Optional.of(entry));
+        when(rememberbrallService.getEntryByUUID(UUID_EXAMPLE)).thenReturn(Optional.of(entry));
 
         //when
-        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(uuid);
+        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(UUID_EXAMPLE);
 
         //then
         assertThat(specificEntry.getBody()).isEqualTo(entry);
@@ -63,11 +62,10 @@ public class RememberbrallControllerTest {
     @Test
     public void showSpecificNonExistingEntry() throws MalformedURLException {
         //given
-        UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000002");
-        when(rememberbrallService.getEntryByUUID(uuid)).thenReturn(Optional.empty());
+        when(rememberbrallService.getEntryByUUID(UUID_EXAMPLE)).thenReturn(Optional.empty());
 
         //when
-        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(uuid);
+        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(UUID_EXAMPLE);
 
         //then
         assertThat(specificEntry.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -75,12 +73,33 @@ public class RememberbrallControllerTest {
 
     @Test
     public void createEntry() {
-        //TODO
+        //given
+        when(rememberbrallService.createEntry(entry)).thenReturn(UUID_EXAMPLE);
+        //when
+        ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(entry);
+        //then
+        assertThat(newEntry.getStatusCode()).isSameAs(HttpStatus.CREATED);
+        assertThat(newEntry.getHeaders().getLocation().toString()).isEqualTo(UUID_EXAMPLE.toString());
     }
 
     @Test
-    public void deleteEntry() {
-        //TODO
+    public void deleteExistingEntry() {
+        //given
+        when(rememberbrallService.deleteEntry(UUID_EXAMPLE)).thenReturn(true);
+        //when
+        ResponseEntity<?> deleteEntry = rememberbrallController.deleteEntry(UUID_EXAMPLE);
+        //then
+        assertThat(deleteEntry.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void deleteNonExistingEntry() {
+        //given
+        when(rememberbrallService.deleteEntry(UUID_EXAMPLE)).thenReturn(false);
+        //when
+        ResponseEntity<?> deleteEntry = rememberbrallController.deleteEntry(UUID_EXAMPLE);
+        //then
+        assertThat(deleteEntry.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
 }
