@@ -33,6 +33,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.module</groupId>
+					<artifactId>jackson-module-kotlin</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -51,18 +57,13 @@
 			<version>23.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>3.0.3</version>
+			<version>3.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.restdocs</groupId>
 			<artifactId>spring-restdocs-restassured</artifactId>
-			<version>1.2.1.RELEASE</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -70,11 +71,6 @@
 					<artifactId>spring-web</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.restdocs</groupId>
-			<artifactId>spring-restdocs-core</artifactId>
-			<version>1.2.1.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -112,7 +108,7 @@
 				<executions>
 					<execution>
 						<id>generate-docs</id>
-						<phase>prepare-package</phase> 
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>process-asciidoc</goal>
 						</goals>
@@ -126,15 +122,15 @@
 						</configuration>
 					</execution>
 				</executions>
-			<dependencies>
-				<dependency> 
-					<groupId>org.springframework.restdocs</groupId>
-					<artifactId>spring-restdocs-asciidoctor</artifactId>
-					<version>1.2.1.RELEASE</version>
-				</dependency>
-			</dependencies>
-		</plugin>
-			
+				<dependencies>
+					<dependency>
+						<groupId>org.springframework.restdocs</groupId>
+						<artifactId>spring-restdocs-asciidoctor</artifactId>
+						<version>1.2.1.RELEASE</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
