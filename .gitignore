@@ -2,6 +2,10 @@ bin
 .classpath
 .project
 .settings
+.idea
+
+#intellij
+rememberbrall.iml
 
 # Windows image file caches
 Thumbs.db
