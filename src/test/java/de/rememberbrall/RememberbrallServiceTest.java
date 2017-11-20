@@ -11,6 +11,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import reactor.core.publisher.Flux;
+
 public class RememberbrallServiceTest {
 
     private RememberbrallService rememberbrallService = new RememberbrallService();
@@ -22,12 +24,12 @@ public class RememberbrallServiceTest {
 
     @Test
     public void getAllEntries() {
-        assertThat(rememberbrallService.getAllEntries()).hasAtLeastOneElementOfType(Entry.class);
+        assertThat(rememberbrallService.getAllEntries()).extracting(entryFlux -> true).hasAtLeastOneElementOfType(Entry.class);
     }
 
     @Test
     public void getFirstEntry() {
-        List<Entry> allEvents = rememberbrallService.getAllEntries();
+        Flux<Entry> allEvents = rememberbrallService.getAllEntries();
         assertThat(allEvents.get(0).getEntryId()).isInstanceOf(UUID.class);
         assertThat(allEvents.get(0).getEntryName()).isInstanceOf(String.class);
         assertThat(allEvents.get(0).getEntryCategory()).isInstanceOf(EntryCategory.class);

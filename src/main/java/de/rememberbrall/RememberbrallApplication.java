@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "de.rememberbrall") //ask Marco or test without
+@ComponentScan(basePackages = "de.rememberbrall")
 public class RememberbrallApplication {
 
     public static void main(String[] args) {

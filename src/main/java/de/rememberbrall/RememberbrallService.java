@@ -13,9 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import reactor.core.CoreSubscriber;
+import reactor.core.publisher.Flux;
+
 @Service
 public class RememberbrallService {
     private List<Entry> entryDb = new ArrayList<>();
+
+    Flux<Entry> entryDbFlux;
 
     @PostConstruct
     @VisibleForTesting
@@ -28,14 +33,12 @@ public class RememberbrallService {
                 new URL("https://www.atlassian.com/git/tutorials/merging-vs-rebasing#the-golden-rule-of-rebasing"));
         Entry mocksNotStubs = new Entry(UUID.fromString("00000000-0000-0000-0000-000000000004"), "Mocks aren't Stubs", EntryCategory.ENTWICKLUNG,
                 new URL("https://martinfowler.com/articles/mocksArentStubs.html"));
-        entryDb.add(rekursion);
-        entryDb.add(betterJava);
-        entryDb.add(goldenRule);
-        entryDb.add(mocksNotStubs);
+
+        entryDbFlux = Flux.just(rekursion,betterJava,goldenRule,mocksNotStubs);
     }
 
-    public List<Entry> getAllEntries() {
-        return entryDb;
+    public Flux<Entry> getAllEntries() {
+        return entryDbFlux;
 
     }
 

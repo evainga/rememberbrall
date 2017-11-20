@@ -22,4 +22,5 @@ public class Entry {
     private final String entryName;
     private final EntryCategory entryCategory;
     private final URL entryUrl;
+
 }

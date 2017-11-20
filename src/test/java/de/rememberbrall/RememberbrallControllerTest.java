@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.Ignore;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
+import reactor.core.publisher.Flux;
 
 public class RememberbrallControllerTest {
 
@@ -36,15 +39,15 @@ public class RememberbrallControllerTest {
     @Test
     public void showAllEntries() {
         //given
-        when(rememberbrallService.getAllEntries()).thenReturn(Arrays.asList(entry, entry, entry));
+        when(rememberbrallService.getAllEntries()).thenReturn(Flux.just(entry, entry, entry));
 
         //when
-        List<Entry> newList = rememberbrallController.showAllEntries();
+        Flux<Entry> newFlux = rememberbrallController.showAllEntries();
 
         //then
-        assertThat(newList).isNotEmpty();
-        assertThat(newList).hasSize(3);
-        assertThat(newList).hasOnlyElementsOfType(Entry.class);
+        assertThat(newFlux).isNotEmpty();
+        assertThat(newFlux).hasSize(3);
+        assertThat(newFlux).hasOnlyElementsOfType(Entry.class);
     }
 
     @Test
