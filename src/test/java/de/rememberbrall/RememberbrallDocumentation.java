@@ -26,8 +26,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.ManualRestDocumentation;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -35,6 +37,7 @@ import org.testng.annotations.Test;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import reactor.core.publisher.Flux;
 
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests {
@@ -50,6 +53,18 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
                 .build()
                 .baseUri("http://localhost")
                 .port(port);
+    }
+
+    @Test
+    public void showAllEntriesReactive() {
+        WebClient client = WebClient.create("http://localhost:" + port);
+        Flux<Entry> result = client.get()
+                .uri("/entries").accept(MediaType.APPLICATION_STREAM_JSON)
+                .retrieve()
+                .bodyToFlux(Entry.class);
+        System.out.println("==== ");
+        result.subscribe(System.out::println);
+        // assertThat(1).isEqualTo(2);
     }
 
     @Test

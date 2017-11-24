@@ -4,12 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Ignore;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -45,9 +42,9 @@ public class RememberbrallControllerTest {
         Flux<Entry> newFlux = rememberbrallController.showAllEntries();
 
         //then
-        assertThat(newFlux).isNotEmpty();
-        assertThat(newFlux).hasSize(3);
-        assertThat(newFlux).hasOnlyElementsOfType(Entry.class);
+        assertThat(newFlux.buffer().blockLast()).isNotEmpty();
+        assertThat(newFlux.buffer().blockLast()).hasSize(3);
+        assertThat(newFlux.buffer().blockLast()).hasOnlyElementsOfType(Entry.class);
     }
 
     @Test

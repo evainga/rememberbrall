@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,16 +23,17 @@ public class RememberbrallServiceTest {
 
     @Test
     public void getAllEntries() {
-        assertThat(rememberbrallService.getAllEntries()).extracting(entryFlux -> true).hasAtLeastOneElementOfType(Entry.class);
+        assertThat(rememberbrallService.getAllEntries().buffer().blockLast()).hasSize(4);
     }
 
     @Test
     public void getFirstEntry() {
         Flux<Entry> allEvents = rememberbrallService.getAllEntries();
-        assertThat(allEvents.get(0).getEntryId()).isInstanceOf(UUID.class);
-        assertThat(allEvents.get(0).getEntryName()).isInstanceOf(String.class);
-        assertThat(allEvents.get(0).getEntryCategory()).isInstanceOf(EntryCategory.class);
-        assertThat(allEvents.get(0).getEntryUrl()).isInstanceOf(URL.class);
+        Entry entry = allEvents.buffer().blockLast().get(0);
+        assertThat(entry.getEntryId()).isInstanceOf(UUID.class);
+        assertThat(entry.getEntryName()).isInstanceOf(String.class);
+        assertThat(entry.getEntryCategory()).isInstanceOf(EntryCategory.class);
+        assertThat(entry.getEntryUrl()).isInstanceOf(URL.class);
     }
 
     @Test
@@ -55,10 +55,10 @@ public class RememberbrallServiceTest {
                 EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
 
         UUID newUuid = rememberbrallService.createEntry(testEntry);
-        List<Entry> allEntries = rememberbrallService.getAllEntries();
+        Flux<Entry> allEntries = rememberbrallService.getAllEntries();
 
         assertThat(newUuid).isNotNull();
-        assertThat(allEntries).contains(testEntry);
+        assertThat(allEntries.buffer().blockLast()).contains(testEntry);
 
     }
 

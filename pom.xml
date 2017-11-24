@@ -33,7 +33,13 @@
 		<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
+            <exclusions>
+            	<exclusion>
+            		<groupId>com.fasterxml.jackson.module</groupId>
+            		<artifactId>jackson-module-kotlin</artifactId>
+            	</exclusion>
+            </exclusions>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

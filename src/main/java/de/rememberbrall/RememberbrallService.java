@@ -12,15 +12,13 @@ import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 
-import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 
 @Service
 public class RememberbrallService {
     private List<Entry> entryDb = new ArrayList<>();
-
-    Flux<Entry> entryDbFlux;
 
     @PostConstruct
     @VisibleForTesting
@@ -34,11 +32,12 @@ public class RememberbrallService {
         Entry mocksNotStubs = new Entry(UUID.fromString("00000000-0000-0000-0000-000000000004"), "Mocks aren't Stubs", EntryCategory.ENTWICKLUNG,
                 new URL("https://martinfowler.com/articles/mocksArentStubs.html"));
 
-        entryDbFlux = Flux.just(rekursion,betterJava,goldenRule,mocksNotStubs);
+        entryDb = Lists.newArrayList(rekursion, betterJava, goldenRule, mocksNotStubs);
     }
 
     public Flux<Entry> getAllEntries() {
-        return entryDbFlux;
+
+        return Flux.fromIterable(entryDb);
 
     }
 
