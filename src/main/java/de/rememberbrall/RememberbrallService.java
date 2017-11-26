@@ -9,16 +9,22 @@ import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+
+import de.rememberbrall.Entry.EntryRespository;
 
 import reactor.core.publisher.Flux;
 
 @Service
 public class RememberbrallService {
     private List<Entry> entryDb = new ArrayList<>();
+
+    @Autowired
+    private EntryRespository entryRespository;
 
     @PostConstruct
     @VisibleForTesting
@@ -36,9 +42,11 @@ public class RememberbrallService {
     }
 
     public Flux<Entry> getAllEntries() {
-
         return Flux.fromIterable(entryDb);
+    }
 
+    public Flux<Entry> getAllEntriesNew() {
+        return entryRespository.findAll();
     }
 
     public Optional<Entry> getEntryByUUID(UUID uuid) {
