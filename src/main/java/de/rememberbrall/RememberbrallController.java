@@ -1,8 +1,5 @@
 package de.rememberbrall;
 
-import java.util.Optional;
-import java.util.UUID;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,43 +15,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class RememberbrallController {
 
     @Autowired
     private RememberbrallService rememberbrallService;
+    @Autowired
+    private EntryRepository entryRepository;
 
     @GetMapping(path = "/entries")
     public Flux<Entry> showAllEntries() {
         return rememberbrallService.getAllEntries();
     }
 
-    @GetMapping(path = "/entries/{uuid}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Entry> showSpecificEntry(@PathVariable UUID uuid) {
-        Optional<Entry> entry = rememberbrallService.getEntryByUUID(uuid);
+    @GetMapping(path = "/entries/{entryId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Entry> showSpecificEntry(@PathVariable String entryId) {
+        Mono<Entry> mono = rememberbrallService.getEntryByUUID(entryId);
 
-        if (entry.isPresent()) {
-            return new ResponseEntity<>(entry.get(), HttpStatus.OK);
+        if (mono.hasElement().block()) {
+            return ResponseEntity.ok(mono.block());
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/entries")
     public ResponseEntity<Entry> createEntry(@Valid @RequestBody Entry entry) {
-        UUID uuid = rememberbrallService.createEntry(entry);
+        String entryId = rememberbrallService.createEntry(entry).block().getEntryId();
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, uuid.toString());
+        headers.add(HttpHeaders.LOCATION, entryId);
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/entries/{uuid}")
-    public ResponseEntity<?> deleteEntry(@PathVariable UUID uuid) {
-        if (rememberbrallService.deleteEntry(uuid)) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @DeleteMapping("/entries/{entryId}")
+    public ResponseEntity<?> deleteEntry(@PathVariable String entryId) {
+        rememberbrallService.deleteEntry(entryId);
+        return ResponseEntity.noContent().build();
     }
 }

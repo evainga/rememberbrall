@@ -14,9 +14,9 @@ import org.junit.Test;
 public class EntryTest {
     @Test
     public void allArgsConstructor() throws MalformedURLException {
-        Entry testEntry = new Entry(UUID.fromString("4414177a-8b5b-4e1f-8fe8-eb736f39ce13"), "LINUX",
+        Entry testEntry = new Entry("4414177a-8b5b-4e1f-8fe8-eb736f39ce13", "LINUX",
                 EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
-        testEntry.setEntryId(UUID.fromString("4414177a-8b5b-4e1f-8fe8-eb736f39ce13"));
+        testEntry.setEntryId("4414177a-8b5b-4e1f-8fe8-eb736f39ce13");
         assertThat(testEntry.getEntryId()).isEqualTo(UUID.fromString("4414177a-8b5b-4e1f-8fe8-eb736f39ce13"));
         assertThat(testEntry.getEntryCategory()).isEqualTo(EntryCategory.LINUX);
         assertThat(testEntry.getEntryName()).isEqualTo("LINUX");

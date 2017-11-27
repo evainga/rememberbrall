@@ -1,25 +1,26 @@
 package de.rememberbrall;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.testng.annotations.Test;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-public class RememberbrallServiceTest {
+public class RememberbrallServiceTest extends MockitoTest {
 
-    private RememberbrallService rememberbrallService = new RememberbrallService();
+    @InjectMocks
+    private RememberbrallService rememberbrallService;
 
-    @Before
-    public void setupDb() throws MalformedURLException {
-        rememberbrallService.setupDb();
-    }
+    @Mock
+    private EntryRepository entryRepository;
 
     @Test
     public void getAllEntries() {
@@ -38,35 +39,26 @@ public class RememberbrallServiceTest {
 
     @Test
     public void getEntryByUUID() throws MalformedURLException {
-        Entry entry = new Entry(UUID.fromString("00000000-0000-0000-0000-000000000001"), "Rekursion in Java", EntryCategory.JAVA,
+        //Given
+        Entry entry = new Entry("00000000-0000-0000-0000-000000000001", "Rekursion in Java", EntryCategory.JAVA,
                 new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-        Optional<Entry> existingEntry = rememberbrallService.getEntryByUUID(UUID.fromString("00000000-0000-0000-0000-000000000001"));
-        Optional<Entry> nonExistingEntry = rememberbrallService.getEntryByUUID(UUID.fromString("40400000-0000-0000-0000-000000000000"));
+        when(entryRepository.findById("00000000-0000-0000-0000-000000000001")).thenReturn(Mono.just(entry));
+        //When
+        Mono<Entry> existingEntry = rememberbrallService.getEntryByUUID("00000000-0000-0000-0000-000000000001");
 
-        assertThat(existingEntry.get()).isEqualTo(entry);
-        assertThat(nonExistingEntry).isNotIn(rememberbrallService); // ask Marco if possible?
-        assertThat(nonExistingEntry).isEqualTo(Optional.empty());
+        //Then
+        assertThat(existingEntry.block()).isEqualTo(entry);
     }
 
     @Test
     public void createEntry() throws MalformedURLException {
 
-        Entry testEntry = new Entry(UUID.fromString("4414177a-8b5b-4e1f-8fe8-eb736f39ce13"), "LINUX",
+        Entry testEntry = new Entry("4414177a-8b5b-4e1f-8fe8-eb736f39ce13", "LINUX",
                 EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
 
-        UUID newUuid = rememberbrallService.createEntry(testEntry);
-        Flux<Entry> allEntries = rememberbrallService.getAllEntries();
+        Mono<Entry> newEntry = rememberbrallService.createEntry(testEntry);
 
-        assertThat(newUuid).isNotNull();
-        assertThat(allEntries.buffer().blockLast()).contains(testEntry);
-
-    }
-
-    @Test // get review from Marco
-    public void deleteEntry() throws MalformedURLException {
-
-        assertThat(rememberbrallService.deleteEntry(UUID.fromString("00000000-0000-0000-0000-000000000001"))).isTrue();
-        assertThat(rememberbrallService.deleteEntry(UUID.fromString("00000000-0000-0000-0000-000000000404"))).isFalse();
+        assertThat(newEntry).isNotNull();
 
     }
 }

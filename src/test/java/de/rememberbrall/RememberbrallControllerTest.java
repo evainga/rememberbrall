@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
-import java.util.Optional;
-import java.util.UUID;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,6 +14,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class RememberbrallControllerTest {
 
@@ -26,7 +25,7 @@ public class RememberbrallControllerTest {
     @Mock
     private Entry entry;
 
-    private static final UUID UUID_EXAMPLE = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    private static final String UUID_EXAMPLE = "00000000-0000-0000-0000-000000000002";
 
     @BeforeTest
     public void initMocks() {
@@ -50,7 +49,7 @@ public class RememberbrallControllerTest {
     @Test
     public void showSpecificExistingEntry() throws MalformedURLException {
         //given
-        when(rememberbrallService.getEntryByUUID(UUID_EXAMPLE)).thenReturn(Optional.of(entry));
+        when(rememberbrallService.getEntryByUUID(UUID_EXAMPLE)).thenReturn(Mono.just(entry));
 
         //when
         ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(UUID_EXAMPLE);
@@ -62,7 +61,7 @@ public class RememberbrallControllerTest {
     @Test
     public void showSpecificNonExistingEntry() throws MalformedURLException {
         //given
-        when(rememberbrallService.getEntryByUUID(UUID_EXAMPLE)).thenReturn(Optional.empty());
+        when(rememberbrallService.getEntryByUUID(UUID_EXAMPLE)).thenReturn(Mono.empty());
 
         //when
         ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(UUID_EXAMPLE);
@@ -74,7 +73,8 @@ public class RememberbrallControllerTest {
     @Test
     public void createEntry() {
         //given
-        when(rememberbrallService.createEntry(entry)).thenReturn(UUID_EXAMPLE);
+
+        when(rememberbrallService.createEntry(entry)).thenReturn(Mono.just(entry));
         //when
         ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(entry);
         //then
@@ -83,23 +83,13 @@ public class RememberbrallControllerTest {
     }
 
     @Test
-    public void deleteExistingEntry() {
+    public void deleteEntry() {
         //given
-        when(rememberbrallService.deleteEntry(UUID_EXAMPLE)).thenReturn(true);
+        when(rememberbrallService.deleteEntry(UUID_EXAMPLE)).thenReturn(Mono.empty());
         //when
         ResponseEntity<?> deleteEntry = rememberbrallController.deleteEntry(UUID_EXAMPLE);
         //then
         assertThat(deleteEntry.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    }
-
-    @Test
-    public void deleteNonExistingEntry() {
-        //given
-        when(rememberbrallService.deleteEntry(UUID_EXAMPLE)).thenReturn(false);
-        //when
-        ResponseEntity<?> deleteEntry = rememberbrallController.deleteEntry(UUID_EXAMPLE);
-        //then
-        assertThat(deleteEntry.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
 }

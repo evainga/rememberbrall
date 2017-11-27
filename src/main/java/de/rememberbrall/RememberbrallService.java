@@ -1,70 +1,31 @@
 package de.rememberbrall;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
-
-import de.rememberbrall.Entry.EntryRespository;
-
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class RememberbrallService {
-    private List<Entry> entryDb = new ArrayList<>();
 
     @Autowired
-    private EntryRespository entryRespository;
-
-    @PostConstruct
-    @VisibleForTesting
-    void setupDb() throws MalformedURLException {
-        Entry rekursion = new Entry(UUID.fromString("00000000-0000-0000-0000-000000000001"), "Rekursion in Java", EntryCategory.JAVA,
-                new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-        Entry betterJava = new Entry(UUID.fromString("00000000-0000-0000-0000-000000000002"), "4 Techniques for Writing better Java", EntryCategory.JAVA,
-                new URL("https://dzone.com/articles/4-techniques-for-writing-better-java"));
-        Entry goldenRule = new Entry(UUID.fromString("00000000-0000-0000-0000-000000000003"), "Goldern Rule of Rebasing", EntryCategory.GIT,
-                new URL("https://www.atlassian.com/git/tutorials/merging-vs-rebasing#the-golden-rule-of-rebasing"));
-        Entry mocksNotStubs = new Entry(UUID.fromString("00000000-0000-0000-0000-000000000004"), "Mocks aren't Stubs", EntryCategory.ENTWICKLUNG,
-                new URL("https://martinfowler.com/articles/mocksArentStubs.html"));
-
-        entryDb = Lists.newArrayList(rekursion, betterJava, goldenRule, mocksNotStubs);
-    }
+    private EntryRepository entryRepository;
 
     public Flux<Entry> getAllEntries() {
-        return Flux.fromIterable(entryDb);
+        return entryRepository.findAll();
     }
 
-    public Flux<Entry> getAllEntriesNew() {
-        return entryRespository.findAll();
+    public Mono<Entry> getEntryByUUID(String entryId) {
+        return entryRepository.findById(entryId);
     }
 
-    public Optional<Entry> getEntryByUUID(UUID uuid) {
-        return entryDb.stream().filter(entry -> entry.getEntryId().equals(uuid)).findFirst();
+    public Mono<Entry> createEntry(Entry newEntry) {
+        return entryRepository.insert(newEntry);
     }
 
-    public UUID createEntry(Entry newEntry) {
-        UUID uuid = UUID.randomUUID();
-        newEntry.setEntryId(uuid);
-        entryDb.add(newEntry);
-        return uuid;
-    }
-
-    public boolean deleteEntry(UUID uuid) {
-        Optional<Entry> deleteEntry = getEntryByUUID(uuid);
-        if (!deleteEntry.isPresent())
-            return false;
-        return entryDb.remove(deleteEntry.get());
+    public Mono<Void> deleteEntry(String entryId) {
+        return entryRepository.deleteById(entryId);
     }
 
 }
