@@ -16,20 +16,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(value = "entryId", allowGetters = true)
+@JsonIgnoreProperties(value = "id", allowGetters = true)
 @Document
 public class Entry {
 
     @Id
-    private String entryId;
+    private String id;
     @Size(min = 2, max = 30, message = "You must use at least 2 and no more than 30 characters")
-    private String entryName;
-    private EntryCategory entryCategory;
-    private URL entryUrl;
+    private String name;
+    private EntryCategory category;
+    private URL url;
 
-    public Entry(String entryName, EntryCategory entryCategory, URL entryUrl) {
-        this.entryName = entryName;
-        this.entryCategory = entryCategory;
-        this.entryUrl = entryUrl;
+    public Entry(String name, EntryCategory category, URL url) {
+        this.name = name;
+        this.category = category;
+        this.url = url;
     }
 }

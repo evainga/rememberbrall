@@ -31,10 +31,10 @@ public class RememberbrallServiceTest extends MockitoTest {
     public void getFirstEntry() {
         Flux<Entry> allEvents = rememberbrallService.getAllEntries();
         Entry entry = allEvents.buffer().blockLast().get(0);
-        assertThat(entry.getEntryId()).isInstanceOf(UUID.class);
-        assertThat(entry.getEntryName()).isInstanceOf(String.class);
-        assertThat(entry.getEntryCategory()).isInstanceOf(EntryCategory.class);
-        assertThat(entry.getEntryUrl()).isInstanceOf(URL.class);
+        assertThat(entry.getId()).isInstanceOf(UUID.class);
+        assertThat(entry.getName()).isInstanceOf(String.class);
+        assertThat(entry.getCategory()).isInstanceOf(EntryCategory.class);
+        assertThat(entry.getUrl()).isInstanceOf(URL.class);
     }
 
     @Test

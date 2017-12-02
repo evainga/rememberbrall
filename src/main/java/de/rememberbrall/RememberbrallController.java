@@ -30,9 +30,9 @@ public class RememberbrallController {
         return rememberbrallService.getAllEntries();
     }
 
-    @GetMapping(path = "/entries/{entryId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Entry> showSpecificEntry(@PathVariable String entryId) {
-        Mono<Entry> mono = rememberbrallService.getEntryByUUID(entryId);
+    @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Entry> showSpecificEntry(@PathVariable String id) {
+        Mono<Entry> mono = rememberbrallService.getEntryByUUID(id);
 
         if (mono.hasElement().block()) {
             return ResponseEntity.ok(mono.block());
@@ -43,15 +43,15 @@ public class RememberbrallController {
 
     @PostMapping("/entries")
     public ResponseEntity<Entry> createEntry(@Valid @RequestBody Entry entry) {
-        String entryId = rememberbrallService.createEntry(entry).block().getEntryId();
+        String id = rememberbrallService.createEntry(entry).block().getId();
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, entryId);
+        headers.add(HttpHeaders.LOCATION, id);
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/entries/{entryId}")
-    public ResponseEntity<?> deleteEntry(@PathVariable String entryId) {
-        rememberbrallService.deleteEntry(entryId);
+    @DeleteMapping("/entries/{id}")
+    public ResponseEntity<?> deleteEntry(@PathVariable String id) {
+        rememberbrallService.deleteEntry(id);
         return ResponseEntity.noContent().build();
     }
 }

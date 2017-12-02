@@ -16,16 +16,16 @@ public class RememberbrallService {
         return entryRepository.findAll();
     }
 
-    public Mono<Entry> getEntryByUUID(String entryId) {
-        return entryRepository.findById(entryId);
+    public Mono<Entry> getEntryByUUID(String id) {
+        return entryRepository.findById(id);
     }
 
     public Mono<Entry> createEntry(Entry newEntry) {
         return entryRepository.insert(newEntry);
     }
 
-    public Mono<Void> deleteEntry(String entryId) {
-        return entryRepository.deleteById(entryId);
+    public Mono<Void> deleteEntry(String id) {
+        return entryRepository.deleteById(id);
     }
 
 }
