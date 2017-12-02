@@ -32,7 +32,7 @@ public class RememberbrallController {
 
     @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Entry> showSpecificEntry(@PathVariable String id) {
-        Mono<Entry> mono = rememberbrallService.getEntryByUUID(id);
+        Mono<Entry> mono = rememberbrallService.getEntryByID(id);
 
         if (mono.hasElement().block()) {
             return ResponseEntity.ok(mono.block());

@@ -16,7 +16,7 @@ public class RememberbrallService {
         return entryRepository.findAll();
     }
 
-    public Mono<Entry> getEntryByUUID(String id) {
+    public Mono<Entry> getEntryByID(String id) {
         return entryRepository.findById(id);
     }
 

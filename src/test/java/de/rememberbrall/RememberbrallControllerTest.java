@@ -25,7 +25,7 @@ public class RememberbrallControllerTest {
     @Mock
     private Entry entry;
 
-    private static final String UUID_EXAMPLE = "00000000-0000-0000-0000-000000000002";
+    private static final String ID_EXAMPLE = "00000000-0000-0000-0000-000000000002";
 
     @BeforeTest
     public void initMocks() {
@@ -49,10 +49,10 @@ public class RememberbrallControllerTest {
     @Test
     public void showSpecificExistingEntry() throws MalformedURLException {
         //given
-        when(rememberbrallService.getEntryByUUID(UUID_EXAMPLE)).thenReturn(Mono.just(entry));
+        when(rememberbrallService.getEntryByID(ID_EXAMPLE)).thenReturn(Mono.just(entry));
 
         //when
-        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(UUID_EXAMPLE);
+        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(ID_EXAMPLE);
 
         //then
         assertThat(specificEntry.getBody()).isEqualTo(entry);
@@ -61,10 +61,10 @@ public class RememberbrallControllerTest {
     @Test
     public void showSpecificNonExistingEntry() throws MalformedURLException {
         //given
-        when(rememberbrallService.getEntryByUUID(UUID_EXAMPLE)).thenReturn(Mono.empty());
+        when(rememberbrallService.getEntryByID(ID_EXAMPLE)).thenReturn(Mono.empty());
 
         //when
-        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(UUID_EXAMPLE);
+        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(ID_EXAMPLE);
 
         //then
         assertThat(specificEntry.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -79,15 +79,15 @@ public class RememberbrallControllerTest {
         ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(entry);
         //then
         assertThat(newEntry.getStatusCode()).isSameAs(HttpStatus.CREATED);
-        assertThat(newEntry.getHeaders().getLocation().toString()).isEqualTo(UUID_EXAMPLE.toString());
+        assertThat(newEntry.getHeaders().getLocation().toString()).isEqualTo(ID_EXAMPLE.toString());
     }
 
     @Test
     public void deleteEntry() {
         //given
-        when(rememberbrallService.deleteEntry(UUID_EXAMPLE)).thenReturn(Mono.empty());
+        when(rememberbrallService.deleteEntry(ID_EXAMPLE)).thenReturn(Mono.empty());
         //when
-        ResponseEntity<?> deleteEntry = rememberbrallController.deleteEntry(UUID_EXAMPLE);
+        ResponseEntity<?> deleteEntry = rememberbrallController.deleteEntry(ID_EXAMPLE);
         //then
         assertThat(deleteEntry.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

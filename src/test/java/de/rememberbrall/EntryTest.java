@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.nullValue;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.UUID;
 
 import org.junit.Test;
 
@@ -17,7 +16,7 @@ public class EntryTest {
         Entry testEntry = new Entry("4414177a-8b5b-4e1f-8fe8-eb736f39ce13", "LINUX",
                 EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
         testEntry.setId("4414177a-8b5b-4e1f-8fe8-eb736f39ce13");
-        assertThat(testEntry.getId()).isEqualTo(UUID.fromString("4414177a-8b5b-4e1f-8fe8-eb736f39ce13"));
+        assertThat(testEntry.getId()).isEqualTo("4414177a-8b5b-4e1f-8fe8-eb736f39ce13");
         assertThat(testEntry.getCategory()).isEqualTo(EntryCategory.LINUX);
         assertThat(testEntry.getName()).isEqualTo("LINUX");
         assertThat(testEntry.getUrl()).isEqualTo(new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));

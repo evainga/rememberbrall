@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.UUID;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,20 +30,20 @@ public class RememberbrallServiceTest extends MockitoTest {
     public void getFirstEntry() {
         Flux<Entry> allEvents = rememberbrallService.getAllEntries();
         Entry entry = allEvents.buffer().blockLast().get(0);
-        assertThat(entry.getId()).isInstanceOf(UUID.class);
+        assertThat(entry.getId()).isInstanceOf(String.class);
         assertThat(entry.getName()).isInstanceOf(String.class);
         assertThat(entry.getCategory()).isInstanceOf(EntryCategory.class);
         assertThat(entry.getUrl()).isInstanceOf(URL.class);
     }
 
     @Test
-    public void getEntryByUUID() throws MalformedURLException {
+    public void getEntryByID() throws MalformedURLException {
         //Given
         Entry entry = new Entry("00000000-0000-0000-0000-000000000001", "Rekursion in Java", EntryCategory.JAVA,
                 new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
         when(entryRepository.findById("00000000-0000-0000-0000-000000000001")).thenReturn(Mono.just(entry));
         //When
-        Mono<Entry> existingEntry = rememberbrallService.getEntryByUUID("00000000-0000-0000-0000-000000000001");
+        Mono<Entry> existingEntry = rememberbrallService.getEntryByID("00000000-0000-0000-0000-000000000001");
 
         //Then
         assertThat(existingEntry.block()).isEqualTo(entry);

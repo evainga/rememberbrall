@@ -21,7 +21,6 @@ import static org.springframework.restdocs.restassured3.RestAssuredRestDocumenta
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -125,7 +124,7 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
         given(getPlainRequestSpec())
                 .filter(document("create-entry",
                         preprocessRequest(prettyPrint()),
-                        requestFields(fieldWithPath("id").description("The UUID of an entry"),
+                        requestFields(fieldWithPath("id").description("The ID of an entry"),
                                 fieldWithPath("name").description("The given name of the entry"),
                                 fieldWithPath("category").description("The given name of the entry"),
                                 fieldWithPath("url").description("The given name of the entry"))))
@@ -143,7 +142,7 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
         given(getPlainRequestSpec())
                 .filter(document("delete-non-existing-entry"))
                 .when()
-                .get("entries/{id}", UUID.fromString("00000000-0000-0000-0000-000000000404"))
+                .get("entries/{id}", "00000000-0000-0000-0000-000000000404")
                 .then()
                 .statusCode(404);
     }
