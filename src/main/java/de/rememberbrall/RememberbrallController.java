@@ -22,8 +22,6 @@ public class RememberbrallController {
 
     @Autowired
     private RememberbrallService rememberbrallService;
-    @Autowired
-    private EntryRepository entryRepository;
 
     @GetMapping(path = "/entries")
     public Flux<Entry> showAllEntries() {

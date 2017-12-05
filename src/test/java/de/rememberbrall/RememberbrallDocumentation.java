@@ -73,50 +73,19 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
                 .filter(document("show-entries",
                         preprocessResponse(prettyPrint()),
                         responseFields(fieldWithPath("[0].id").description("The ID of an entry"),
-                                fieldWithPath("[0].name").optional().description("The name of an entry"),
-                                fieldWithPath("[0].category").optional().description("The category an entry can be associated with"),
-                                fieldWithPath("[0].url").optional().description("The absolute URL of an entry"))))
+                                fieldWithPath("[0].name").description("The name of an entry"),
+                                fieldWithPath("[0].category").description("The category an entry can be associated with"),
+                                fieldWithPath("[0].url").description("The absolute URL of an entry"))))
                 .accept(ContentType.JSON)
                 .when()
                 .get("entries")
                 .then()
                 .statusCode(200)
-                .body("$", hasSize(greaterThan(0)));
-//                .body("[0].id", both(instanceOf(String.class)).and(not(""))) FIXME
-//                .body("[0].name", both(instanceOf(String.class)).and(not("")))
-//                .body("[0].category", both(instanceOf(String.class)).and(not("")))
-//                .body("[0].url", both(instanceOf(String.class)).and(not("")));
-    }
-
-    @Test
-    public void createAndShowSpecificEntry() throws MalformedURLException {
-        Entry entry = new Entry("LINUX", EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
-        String locationHeader = given(getPlainRequestSpec())
-                .when()
-                .body(entry)
-                .contentType(ContentType.JSON)
-                .post("entries")
-                .then()
-                .statusCode(201)
-                .extract()
-                .header(HttpHeaders.LOCATION);
-
-        given(getPlainRequestSpec())
-                .filter(document("show-specific-entry",
-                        preprocessResponse(prettyPrint()),
-                        responseFields(fieldWithPath("id").description("The ID of an entry"),
-                                fieldWithPath("name").description("The name of an entry"),
-                                fieldWithPath("category").description("The category an entry can be associated with"),
-                                fieldWithPath("url").description("The absolute URL of an entry"))))
-                .accept(ContentType.JSON)
-                .when()
-                .get("entries/{id}", locationHeader)
-                .then()
-                .statusCode(200)
-                .body("id", any(String.class))
-                .body("name", is("LINUX"))
-                .body("category", is("LINUX"))
-                .body("url", is("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
+                .body("$", hasSize(greaterThan(0)))
+                .body("[0].id", both(instanceOf(String.class)).and(not("")))
+                .body("[0].name", both(instanceOf(String.class)).and(not("")))
+                .body("[0].category", both(instanceOf(String.class)).and(not("")))
+                .body("[0].url", both(instanceOf(String.class)).and(not("")));
     }
 
     @Test
@@ -138,33 +107,60 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
     }
 
     @Test
+    public void createAndShowSpecificEntry() throws MalformedURLException {
+        String locationHeader = getLocationHeaderForCreatedEntry();
+
+        given(getPlainRequestSpec())
+                .filter(document("show-specific-entry",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(fieldWithPath("id").description("The ID of an entry"),
+                                fieldWithPath("name").description("The name of an entry"),
+                                fieldWithPath("category").description("The category an entry can be associated with"),
+                                fieldWithPath("url").description("The absolute URL of an entry"))))
+                .accept(ContentType.JSON)
+                .when()
+                .get("entries/{id}", locationHeader)
+                .then()
+                .statusCode(200)
+                .body("id", any(String.class))
+                .body("name", is("LINUX"))
+                .body("category", is("LINUX"))
+                .body("url", is("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
+    }
+
+    @Test
     public void deleteNonExistingEntry() {
         given(getPlainRequestSpec())
                 .filter(document("delete-non-existing-entry"))
                 .when()
-                .get("entries/{id}", "00000000-0000-0000-0000-000000000404")
+                .delete("entries/{id}", "dummyId")
                 .then()
-                .statusCode(404);
+                .statusCode(204);
     }
 
-    @Test(enabled = false)
+    @Test
     public void deleteNewlyCreatedEntry() throws MalformedURLException {
-        String id = given(getPlainRequestSpec())
+        String locationHeader = getLocationHeaderForCreatedEntry();
+
+        given(getPlainRequestSpec())
+                .filter(document("delete-newly-created-entry"))
                 .when()
-                .body(new Entry("LINUX", EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)")))
+                .delete("entries/{id}", locationHeader)
+                .then()
+                .statusCode(204);
+    }
+
+    private String getLocationHeaderForCreatedEntry() throws MalformedURLException {
+        Entry entry = new Entry("LINUX", EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
+        return given(getPlainRequestSpec())
+                .when()
+                .body(entry)
                 .contentType(ContentType.JSON)
                 .post("entries")
                 .then()
                 .statusCode(201)
                 .extract()
                 .header(HttpHeaders.LOCATION);
-
-        given(getPlainRequestSpec())
-                .filter(document("delete-newly-created-entry"))
-                .when()
-                .delete("entries/{id}", id)
-                .then()
-                .statusCode(204);
     }
 
     @BeforeMethod(alwaysRun = true)
@@ -176,13 +172,4 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
     public void tearDown() {
         restDocumentation.afterTest();
     }
-
-    //    Entry rekursion = new Entry("00000000-0000-0000-0000-000000000001", "Rekursion in Java", category.JAVA,
-    //            new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-    //    Entry betterJava = new Entry("00000000-0000-0000-0000-000000000002", "4 Techniques for Writing better Java", category.JAVA,
-    //            new URL("https://dzone.com/articles/4-techniques-for-writing-better-java"));
-    //    Entry goldenRule = new Entry("00000000-0000-0000-0000-000000000003", "Goldern Rule of Rebasing", category.GIT,
-    //            new URL("https://www.atlassian.com/git/tutorials/merging-vs-rebasing#the-golden-rule-of-rebasing"));
-    //    Entry mocksNotStubs = new Entry("00000000-0000-0000-0000-000000000004", "Mocks aren't Stubs", category.ENTWICKLUNG,
-    //            new URL("https://martinfowler.com/articles/mocksArentStubs.html"));
 }
