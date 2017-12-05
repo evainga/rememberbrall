@@ -148,6 +148,12 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
                 .delete("entries/{id}", locationHeader)
                 .then()
                 .statusCode(204);
+
+        given(getPlainRequestSpec())
+                .when()
+                .get("entries/{id}", locationHeader)
+                .then()
+                .statusCode(404);
     }
 
     private String getLocationHeaderForCreatedEntry() throws MalformedURLException {
