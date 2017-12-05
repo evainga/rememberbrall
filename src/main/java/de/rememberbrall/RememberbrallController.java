@@ -49,7 +49,7 @@ public class RememberbrallController {
 
     @DeleteMapping("/entries/{id}")
     public ResponseEntity<?> deleteEntry(@PathVariable String id) {
-        rememberbrallService.deleteEntry(id);
+        rememberbrallService.deleteEntry(id).block();
         return ResponseEntity.noContent().build();
     }
 }
