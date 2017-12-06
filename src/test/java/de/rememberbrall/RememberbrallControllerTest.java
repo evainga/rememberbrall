@@ -79,7 +79,7 @@ public class RememberbrallControllerTest {
         ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(entry);
         //then
         assertThat(newEntry.getStatusCode()).isSameAs(HttpStatus.CREATED);
-        assertThat(newEntry.getHeaders().getLocation().toString()).isEqualTo(ID_EXAMPLE.toString());
+        assertThat(newEntry.getHeaders().getLocation().toString()).isEqualTo(ID_EXAMPLE);
     }
 
     @Test

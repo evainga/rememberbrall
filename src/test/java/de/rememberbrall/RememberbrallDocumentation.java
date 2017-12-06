@@ -45,7 +45,7 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
     private ManualRestDocumentation restDocumentation = new ManualRestDocumentation("target/generated-snippets");
 
     @Value("${local.server.port}")
-    int port;
+    private int port;
 
     public RequestSpecification getPlainRequestSpec() {
         return new RequestSpecBuilder()
