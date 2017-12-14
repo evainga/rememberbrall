@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @SpringBootApplication
 @ComponentScan(basePackages = "de.rememberbrall")
 @EnableReactiveMongoRepositories
+//@PropertySource("application-${spring.profiles.active}.properties")
 public class RememberbrallApplication {
 
     public static void main(String[] args) {

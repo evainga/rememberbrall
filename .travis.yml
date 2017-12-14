@@ -4,7 +4,7 @@ sudo: false
 
 install: true
 
-script: mvn clean verify
+script: mvn clean verify -Dspring.profiles.active=local
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
