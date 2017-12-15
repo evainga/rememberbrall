@@ -162,6 +162,11 @@
 										${project.build.directory}/generated-docs
 									</directory>
 								</resource>
+								<resource>
+									<directory>
+										${project.build.directory}/generated-snippets
+									</directory>
+								</resource>
 							</resources>
 						</configuration>
 					</execution>
