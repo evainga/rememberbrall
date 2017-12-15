@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.ModelAndView;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -30,6 +31,17 @@ public class RememberbrallControllerTest {
     @BeforeTest
     public void initMocks() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void forwardToRestDocumentation() {
+        //given
+
+        //when
+        ModelAndView modelAndView = rememberbrallController.forwardToRestDocumentation();
+
+        //then
+        assertThat(modelAndView.getViewName()).isEqualTo("forward:/docs/index.html");
     }
 
     @Test

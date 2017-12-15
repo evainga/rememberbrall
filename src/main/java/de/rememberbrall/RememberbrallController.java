@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,6 +23,11 @@ public class RememberbrallController {
 
     @Autowired
     private RememberbrallService rememberbrallService;
+
+    @GetMapping(path = "/")
+    public ModelAndView forwardToRestDocumentation() {
+        return new ModelAndView("forward:/docs/index.html");
+    }
 
     @GetMapping(path = "/entries")
     public Flux<Entry> showAllEntries() {
