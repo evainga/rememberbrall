@@ -14,7 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class RememberbrallControllerTest {
@@ -44,19 +43,19 @@ public class RememberbrallControllerTest {
         assertThat(modelAndView.getViewName()).isEqualTo("forward:/docs/index.html");
     }
 
-    @Test
-    public void showAllEntries() {
-        //given
-        when(rememberbrallService.getAllEntries()).thenReturn(Flux.just(entry, entry, entry));
-
-        //when
-        Flux<Entry> newFlux = rememberbrallController.showAllEntries();
-
-        //then
-        assertThat(newFlux.buffer().blockLast()).isNotEmpty();
-        assertThat(newFlux.buffer().blockLast()).hasSize(3);
-        assertThat(newFlux.buffer().blockLast()).hasOnlyElementsOfType(Entry.class);
-    }
+//    @Test
+//    public void showAllEntries() {
+//        //given
+//        when(rememberbrallService.getAllEntries()).thenReturn(Flux.just(entry, entry, entry));
+//
+//        //when
+//        Flux<Entry> newFlux = rememberbrallController.showAllEntries();
+//
+//        //then
+//        assertThat(newFlux.buffer().blockLast()).isNotEmpty();
+//        assertThat(newFlux.buffer().blockLast()).hasSize(3);
+//        assertThat(newFlux.buffer().blockLast()).hasOnlyElementsOfType(Entry.class);
+//    }
 
     @Test
     public void showSpecificExistingEntry() throws MalformedURLException {

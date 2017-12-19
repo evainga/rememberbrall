@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -30,8 +31,12 @@ public class RememberbrallController {
     }
 
     @GetMapping(path = "/entries")
-    public Flux<Entry> showAllEntries() {
-        return rememberbrallService.getAllEntries();
+    public Model showAllEntries(final Model model) {
+        int elementsOfFluxInSseChunk = 1;
+        model.addAttribute("entries", new ReactiveDataDriverContextVariable(
+                rememberbrallService.getAllEntries(),
+                elementsOfFluxInSseChunk));
+        return model;
     }
 
     @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
