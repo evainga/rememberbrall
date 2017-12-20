@@ -67,7 +67,7 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
         // assertThat(1).isEqualTo(2);
     }
 
-    @Test
+    @Test(enabled = false)
     public void showAllEntries() {
         given(getPlainRequestSpec())
                 .filter(document("show-entries",

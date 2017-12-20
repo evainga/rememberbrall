@@ -7,36 +7,56 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.thymeleaf.spring5.context.webflux.IReactiveDataDriverContextVariable;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RestController
+@Controller
 public class RememberbrallController {
 
     @Autowired
     private RememberbrallService rememberbrallService;
 
-    @GetMapping(path = "/")
-    public ModelAndView forwardToRestDocumentation() {
-        return new ModelAndView("forward:/docs/index.html");
+    //    @GetMapping(path = "/")
+    //    public ModelAndView forwardToRestDocumentation() {
+    //        return new ModelAndView("forward:/docs/index.html");
+    //    }
+
+    @RequestMapping("/")
+    public String index() {
+        return "index";
     }
 
-    @GetMapping(path = "/entries")
-    public Model showAllEntries(final Model model) {
-        int elementsOfFluxInSseChunk = 1;
-        model.addAttribute("entries", new ReactiveDataDriverContextVariable(
-                rememberbrallService.getAllEntries(),
-                elementsOfFluxInSseChunk));
-        return model;
+    @RequestMapping("/events")
+    public String events(final Model model) {
+
+        final Flux<Entry> playlistStream = this.rememberbrallService.getAllEntries();
+
+        final IReactiveDataDriverContextVariable dataDriver = new ReactiveDataDriverContextVariable(playlistStream, 1, 1);
+
+        model.addAttribute("data", dataDriver);
+
+        return "events";
+
+    }
+
+    @RequestMapping(path = "/entries", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Entry> showAllEntries(final Model model) {
+        //        model.addAttribute("entries", new ReactiveDataDriverContextVariable(rememberbrallService.getAllEntries(), 10));
+        //        IReactiveDataDriverContextVariable dataDriver = new ReactiveDataDriverContextVariable(rememberbrallService.getAllEntries(), 1, 1);
+        //        model.addAttribute("entries", dataDriver);
+        //        return "entryPage";
+        return rememberbrallService.getAllEntries();
     }
 
     @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

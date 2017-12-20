@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(value = "id", allowGetters = true)
 @Document
 public class Entry {
-
     @Id
     private String id;
     @Size(min = 2, max = 30, message = "You must use at least 2 and no more than 30 characters")
