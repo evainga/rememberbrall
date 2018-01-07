@@ -42,6 +42,8 @@ import reactor.core.publisher.Flux;
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests {
 
+    private static final String LINUX_WASCHMITTEL = "Linux Waschmittel";
+
     private ManualRestDocumentation restDocumentation = new ManualRestDocumentation("target/generated-snippets");
 
     @Value("${local.server.port}")
@@ -98,7 +100,7 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
                                 fieldWithPath("category").description("The given name of the entry"),
                                 fieldWithPath("url").description("The given name of the entry"))))
                 .when()
-                .body(new Entry("LINUX", EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)")))
+                .body(new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)")))
                 .contentType(ContentType.JSON)
                 .post("entries")
                 .then()
@@ -123,7 +125,7 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
                 .then()
                 .statusCode(200)
                 .body("id", any(String.class))
-                .body("name", is("LINUX"))
+                .body("name", is(LINUX_WASCHMITTEL))
                 .body("category", is("LINUX"))
                 .body("url", is("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
     }
@@ -157,7 +159,7 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
     }
 
     private String getLocationHeaderForCreatedEntry() throws MalformedURLException {
-        Entry entry = new Entry("LINUX", EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
+        Entry entry = new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
         return given(getPlainRequestSpec())
                 .when()
                 .body(entry)

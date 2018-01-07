@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import org.thymeleaf.spring5.context.webflux.IReactiveDataDriverContextVariable;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
@@ -27,36 +30,30 @@ public class RememberbrallController {
     @Autowired
     private RememberbrallService rememberbrallService;
 
-    //    @GetMapping(path = "/")
-    //    public ModelAndView forwardToRestDocumentation() {
-    //        return new ModelAndView("forward:/docs/index.html");
+    //        @GetMapping(path = "/")
+    //        public ModelAndView forwardToRestDocumentation() {
+    //            return new ModelAndView("forward:/docs/index.html");
     //    }
 
-    @RequestMapping("/")
-    public String index() {
-        return "index";
+    //    This is a workaround, see https://github.com/spring-projects/spring-boot/issues/9785
+    @Component
+    public class CustomWebFilter implements WebFilter {
+        @Override
+        public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+            if (exchange.getRequest().getURI().getPath().equals("/")) {
+                return chain.filter(exchange.mutate().request(exchange.getRequest().mutate().path("/docs/index.html").build()).build());
+            }
+
+            return chain.filter(exchange);
+        }
     }
 
-    @RequestMapping("/events")
-    public String events(final Model model) {
-
-        final Flux<Entry> playlistStream = this.rememberbrallService.getAllEntries();
-
-        final IReactiveDataDriverContextVariable dataDriver = new ReactiveDataDriverContextVariable(playlistStream, 1, 1);
-
-        model.addAttribute("data", dataDriver);
-
-        return "events";
-
-    }
-
-    @RequestMapping(path = "/entries", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Entry> showAllEntries(final Model model) {
-        //        model.addAttribute("entries", new ReactiveDataDriverContextVariable(rememberbrallService.getAllEntries(), 10));
-        //        IReactiveDataDriverContextVariable dataDriver = new ReactiveDataDriverContextVariable(rememberbrallService.getAllEntries(), 1, 1);
-        //        model.addAttribute("entries", dataDriver);
-        //        return "entryPage";
-        return rememberbrallService.getAllEntries();
+    @GetMapping("/entries")
+    public String showAllEntries(final Model model) {
+        final Flux<Entry> entryStream = this.rememberbrallService.getAllEntries();
+        final IReactiveDataDriverContextVariable entryDriver = new ReactiveDataDriverContextVariable(entryStream, 1, 1);
+        model.addAttribute("entries", entryDriver);
+        return "entries";
     }
 
     @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

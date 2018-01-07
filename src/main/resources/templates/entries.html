@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <title>Rememberbrall Entries</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="../static/style.css" th:href="@{/style.css}" type="text/css"/>
+  </head>
+
+  <body>
+  <h2>Rememberbrall Entries</h2>
+
+    <h3>Listing being sent as SSE (Server-Sent Events)</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>URL</th>
+        </tr>
+      </thead>
+      <tbody id="entryTable">
+      <!--/*@thymesVar id="entries" type="de.rememberbrall.Entry[]"*/-->
+        <tr th:each="entry : ${entries}">
+          <td th:text="${entry.name}" class="name-cell">ENTWICKLUNG</td>
+          <td th:text="${entry.category}" class="category-cell">Reactive and SSE</td>
+          <td th:text="${entry.url}" class="url-cell">https://www.callicoder.com/reactive-rest-apis-spring-webflux-reactive-mongo/</td>
+        </tr>
+      </tbody>
+    </table>
+
+  <!--<script>-->
+
+      <!--var entryTable = document.getElementById("entryTable");-->
+
+      <!--var source = new EventSource("/entries");-->
+      <!--source.addEventListener("message", function(event) {-->
+          <!--entryTable.innerHTML = event.data + entryTable.innerHTML;-->
+      <!--});-->
+
+  <!--</script>-->
+
+  </body>
+
+</html>
