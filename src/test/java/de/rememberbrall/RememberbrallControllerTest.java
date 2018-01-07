@@ -33,12 +33,7 @@ public class RememberbrallControllerTest {
 
     //    @Test
     //    public void forwardToRestDocumentation() {
-    //        //given
-    //
-    //        //when
     //        ModelAndView modelAndView = rememberbrallController.forwardToRestDocumentation();
-    //
-    //        //then
     //        assertThat(modelAndView.getViewName()).isEqualTo("forward:/docs/index.html");
     //    }
 
