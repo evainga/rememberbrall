@@ -1,23 +1,5 @@
 package de.rememberbrall;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.any;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
-
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.restdocs.ManualRestDocumentation;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,13 +15,31 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static io.restassured.RestAssured.given;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.http.MediaType.APPLICATION_STREAM_JSON;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 import reactor.core.publisher.Flux;
 
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests {
+public class RememberbrallControllerDocumentation extends AbstractTestNGSpringContextTests {
 
     private static final String LINUX_WASCHMITTEL = "Linux Waschmittel";
 
@@ -60,8 +59,10 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
     @Test
     public void showAllEntriesReactive() {
         WebClient client = WebClient.create("http://localhost:" + port);
-        Flux<Entry> result = client.get()
-                .uri("/entries").accept(MediaType.APPLICATION_STREAM_JSON)
+        Flux<Entry> result = client
+                .get()
+                .uri("/entries")
+                .accept(APPLICATION_STREAM_JSON)
                 .retrieve()
                 .bodyToFlux(Entry.class);
         System.out.println("==== ");
@@ -78,7 +79,6 @@ public class RememberbrallDocumentation extends AbstractTestNGSpringContextTests
                                 fieldWithPath("[0].name").description("The name of an entry"),
                                 fieldWithPath("[0].category").description("The category an entry can be associated with"),
                                 fieldWithPath("[0].url").description("The absolute URL of an entry"))))
-                .accept(ContentType.JSON)
                 .when()
                 .get("entries")
                 .then()

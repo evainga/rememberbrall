@@ -98,6 +98,7 @@
 				<configuration>
 					<includes>
 						<include>**/*Documentation.java</include>
+						<include>**/*Test.java</include>
 					</includes>
 					<properties>
 						<property>

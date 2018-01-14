@@ -1,8 +1,5 @@
 package de.rememberbrall;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 import java.net.MalformedURLException;
 
 import org.mockito.InjectMocks;
@@ -10,9 +7,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class RememberbrallControllerTest {
@@ -23,6 +24,8 @@ public class RememberbrallControllerTest {
     private RememberbrallService rememberbrallService;
     @Mock
     private Entry entry;
+    @Mock
+    private Model model;
 
     private static final String ID_EXAMPLE = "00000000-0000-0000-0000-000000000002";
 
@@ -37,19 +40,15 @@ public class RememberbrallControllerTest {
     //        assertThat(modelAndView.getViewName()).isEqualTo("forward:/docs/index.html");
     //    }
 
-    //    @Test
-    //    public void showAllEntries() {
-    //        //given
-    //        when(rememberbrallService.getAllEntries()).thenReturn(Flux.just(entry, entry, entry));
-    //
-    //        //when
-    //        Flux<Entry> newFlux = rememberbrallController.showAllEntries();
-    //
-    //        //then
-    //        assertThat(newFlux.buffer().blockLast()).isNotEmpty();
-    //        assertThat(newFlux.buffer().blockLast()).hasSize(3);
-    //        assertThat(newFlux.buffer().blockLast()).hasOnlyElementsOfType(Entry.class);
-    //    }
+    @Test
+    public void showAllEntries() {
+        //given
+        when(rememberbrallService.getAllEntries()).thenReturn(Flux.just(entry, entry, entry));
+        //when
+        String showAllEntries = rememberbrallController.showAllEntries(model);
+        //then
+        assertThat(showAllEntries).isEqualTo("entries");
+    }
 
     @Test
     public void showSpecificExistingEntry() throws MalformedURLException {
@@ -78,10 +77,13 @@ public class RememberbrallControllerTest {
     @Test
     public void createEntry() {
         //given
+        Mono<Entry> entryAsMono = Mono.just(this.entry);
+        when(rememberbrallService.createEntry(this.entry)).thenReturn(entryAsMono);
+        when(entryAsMono.block().getId()).thenReturn(ID_EXAMPLE);
 
-        when(rememberbrallService.createEntry(entry)).thenReturn(Mono.just(entry));
         //when
-        ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(entry);
+        ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(this.entry);
+
         //then
         assertThat(newEntry.getStatusCode()).isSameAs(HttpStatus.CREATED);
         assertThat(newEntry.getHeaders().getLocation().toString()).isEqualTo(ID_EXAMPLE);
