@@ -28,7 +28,7 @@ public class RememberbrallServiceTest extends MockitoTest {
 
 
     @BeforeTest
-    public void createInitialEntry() throws MalformedURLException {
+    public void createInitialEntries() throws MalformedURLException {
         entry = new Entry("00000000-0000-0000-0000-000000000001", "Rekursion in Java", EntryCategory.JAVA,
                 new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
         entry2 = new Entry("00000000-0000-0000-0000-000000000002", "Reactive Testing", EntryCategory.ENTWICKLUNG,
@@ -37,7 +37,7 @@ public class RememberbrallServiceTest extends MockitoTest {
 
 
     @Test
-    public void getAllEntriesValidOrder() throws MalformedURLException {
+    public void getAllEntriesValidOrder() {
         //given
         Flux<Entry> entryFlux = Flux.just(entry, entry2);
         when(entryRepository.findAll()).thenReturn(entryFlux);
@@ -53,7 +53,7 @@ public class RememberbrallServiceTest extends MockitoTest {
     }
 
     @Test
-    public void getAllEntriesInvalidOrder() throws MalformedURLException {
+    public void getAllEntriesInvalidOrder() {
         //given
         Flux<Entry> entryFlux = Flux.just(entry, entry2);
         when(entryRepository.findAll()).thenReturn(entryFlux);
@@ -69,7 +69,7 @@ public class RememberbrallServiceTest extends MockitoTest {
     }
 
     @Test
-    public void testFirstOfAllEntries() throws MalformedURLException {
+    public void testFirstOfAllEntries() {
         //given
         Flux<Entry> entryFlux = Flux.just(entry, entry2);
         when(entryRepository.findAll()).thenReturn(entryFlux);
