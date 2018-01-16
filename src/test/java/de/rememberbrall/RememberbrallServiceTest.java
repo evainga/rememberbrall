@@ -2,8 +2,6 @@ package de.rememberbrall;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -11,13 +9,16 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 public class RememberbrallServiceTest extends MockitoTest {
 
     private Entry entry;
+    private Entry entry2;
 
     @InjectMocks
     private RememberbrallService rememberbrallService;
@@ -30,33 +31,62 @@ public class RememberbrallServiceTest extends MockitoTest {
     public void createInitialEntry() throws MalformedURLException {
         entry = new Entry("00000000-0000-0000-0000-000000000001", "Rekursion in Java", EntryCategory.JAVA,
                 new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
+        entry2 = new Entry("00000000-0000-0000-0000-000000000002", "Reactive Testing", EntryCategory.ENTWICKLUNG,
+                new URL("http://projectreactor.io/docs/core/release/reference/docs/index.html#testing"));
     }
 
 
     @Test
-    public void getAllEntries() throws MalformedURLException {
+    public void getAllEntriesValidOrder() throws MalformedURLException {
         //given
-        Entry entry2 = new Entry("00000000-0000-0000-0000-000000000002", "Rekursion in Java", EntryCategory.JAVA,
-                new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-
-        List<Entry> entryList = new ArrayList<>();
-        entryList.add(entry);
-        entryList.add(entry2);
-        Flux<Entry> entryFlux = Flux.fromIterable(entryList);
+        Flux<Entry> entryFlux = Flux.just(entry, entry2);
         when(entryRepository.findAll()).thenReturn(entryFlux);
 
         //when
         Flux<Entry> allEntries = rememberbrallService.getAllEntries();
 
         //then
-        assertThat(allEntries.buffer().blockLast()).hasSize(2);
-        assertThat(allEntries.buffer().blockLast()).hasOnlyElementsOfType(Entry.class);
+        StepVerifier.create(allEntries)
+                .assertNext(firstEntry -> assertThat(firstEntry.getName()).isEqualTo("Rekursion in Java"))
+                .assertNext(secondEntry -> assertThat(secondEntry.getName()).isEqualTo("Reactive Testing"))
+                .verifyComplete();
+    }
 
-        Entry firstEntry = allEntries.buffer().blockLast().get(0);
-        assertThat(firstEntry.getId()).isInstanceOf(String.class);
-        assertThat(firstEntry.getName()).isInstanceOf(String.class);
-        assertThat(firstEntry.getCategory()).isInstanceOf(EntryCategory.class);
-        assertThat(firstEntry.getUrl()).isInstanceOf(URL.class);
+    @Test
+    public void getAllEntriesInvalidOrder() throws MalformedURLException {
+        //given
+        Flux<Entry> entryFlux = Flux.just(entry, entry2);
+        when(entryRepository.findAll()).thenReturn(entryFlux);
+
+        //when
+        Flux<Entry> allEntries = rememberbrallService.getAllEntries();
+
+        //then
+        assertThatExceptionOfType(AssertionError.class)
+                .isThrownBy(() -> StepVerifier.create(allEntries)
+                        .expectNext(entry2, entry)
+                        .verifyComplete()).withMessageContaining("expectation \"expectNext(Entry(id=");
+    }
+
+    @Test
+    public void testFirstOfAllEntries() throws MalformedURLException {
+        //given
+        Flux<Entry> entryFlux = Flux.just(entry, entry2);
+        when(entryRepository.findAll()).thenReturn(entryFlux);
+
+        //when
+        Flux<Entry> allEntries = rememberbrallService.getAllEntries();
+
+        //then
+        StepVerifier.create(allEntries)
+                .assertNext(entry -> {
+                    assertThat(entry.getId()).isInstanceOf(String.class);
+                    assertThat(entry.getName()).isInstanceOf(String.class);
+                    assertThat(entry.getCategory()).isInstanceOf(EntryCategory.class);
+                    assertThat(entry.getUrl()).isInstanceOf(URL.class);
+                })
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     @Test
@@ -68,7 +98,10 @@ public class RememberbrallServiceTest extends MockitoTest {
         Mono<Entry> existingEntry = rememberbrallService.getEntryByID("00000000-0000-0000-0000-000000000001");
 
         //then
-        assertThat(existingEntry.block()).isEqualTo(entry);
+        StepVerifier
+                .create(existingEntry)
+                .expectNextMatches(e -> e.equals(this.entry))
+                .verifyComplete();
     }
 
     @Test
@@ -83,4 +116,5 @@ public class RememberbrallServiceTest extends MockitoTest {
         //then
         assertThat(newEntry).isNotNull();
     }
+
 }
