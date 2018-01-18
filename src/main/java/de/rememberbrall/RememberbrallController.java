@@ -23,7 +23,7 @@ public class RememberbrallController {
     @Autowired
     private RememberbrallService rememberbrallService;
 
-    @GetMapping(path = "/entries", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(path = "/entries")
     public Flux<Entry> showAllEntries() {
         return rememberbrallService.getAllEntries();
     }
