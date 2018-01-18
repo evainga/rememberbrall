@@ -22,8 +22,6 @@ public class ThymeleafControllerTest {
     @Mock
     private Model model;
 
-    private static final String ID_EXAMPLE = "00000000-0000-0000-0000-000000000002";
-
     @BeforeTest
     public void initMocks() {
         MockitoAnnotations.initMocks(this);

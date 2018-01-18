@@ -1,5 +1,7 @@
 package de.rememberbrall;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +25,7 @@ public class ThymeleafController {
 
     @GetMapping(path = "/thymeleaf-entries")
     public String showAllEntries(final Model model) {
-        final Flux<Entry> entryStream = this.rememberbrallService.getAllEntries();
+        final Flux<Entry> entryStream = this.rememberbrallService.getAllEntries().delayElements(Duration.ofMillis(50));
         final IReactiveDataDriverContextVariable entryDriver = new ReactiveDataDriverContextVariable(entryStream, 1, 1);
         model.addAttribute("entries", entryDriver);
         return "thymeleaf-entries";
