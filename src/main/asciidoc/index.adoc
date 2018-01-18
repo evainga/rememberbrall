@@ -13,7 +13,9 @@ Eva Göttert
 
 This artifact holds integration tests for Rememberbrall and generates living documentation from this programme. In the next chapters, `de.rememberbrall.RememberbrallController` is being documented with its respective request and response semantics.
 
-This is done with https://github.com/rest-assured/rest-assured[Rest Assured] and http://projects.spring.io/spring-restdocs[Spring REST Docs].
+Additionally you can check out a Thymeleaf representation of all entries under link:/thymeleaf-entries[Rememberbrall Entries with Thymeleaf]
+
+This documentation is done with https://github.com/rest-assured/rest-assured[Rest Assured] and http://projects.spring.io/spring-restdocs[Spring REST Docs].
 
 
 == Get all entries

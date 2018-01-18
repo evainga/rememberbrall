@@ -27,7 +27,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.springframework.http.MediaType.APPLICATION_STREAM_JSON;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -40,8 +39,7 @@ import reactor.core.publisher.Flux;
 
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RememberbrallControllerDocumentation extends AbstractTestNGSpringContextTests {
-
-    private static final String LINUX_WASCHMITTEL = "Linux Waschmittel";
+    static final String LINUX_WASCHMITTEL = "Linux Waschmittel";
 
     private ManualRestDocumentation restDocumentation = new ManualRestDocumentation("target/generated-snippets");
 
@@ -62,15 +60,16 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
         Flux<Entry> result = client
                 .get()
                 .uri("/entries")
-                .accept(APPLICATION_STREAM_JSON)
+                .accept()
                 .retrieve()
                 .bodyToFlux(Entry.class);
-        System.out.println("==== ");
+        System.out.println("==== START ");
         result.subscribe(System.out::println);
-        // assertThat(1).isEqualTo(2);
+        System.out.println("==== THE END ");
+//        assertThat(1).isEqualTo(2);
     }
 
-    @Test(enabled = false)
+    @Test
     public void showAllEntries() {
         given(getPlainRequestSpec())
                 .filter(document("show-entries",
@@ -79,8 +78,9 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                                 fieldWithPath("[0].name").description("The name of an entry"),
                                 fieldWithPath("[0].category").description("The category an entry can be associated with"),
                                 fieldWithPath("[0].url").description("The absolute URL of an entry"))))
+                .accept(ContentType.JSON)
                 .when()
-                .get("entries")
+                .get("/entries")
                 .then()
                 .statusCode(200)
                 .body("$", hasSize(greaterThan(0)))

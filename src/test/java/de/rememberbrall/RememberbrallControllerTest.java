@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -15,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 public class RememberbrallControllerTest {
 
@@ -24,8 +24,6 @@ public class RememberbrallControllerTest {
     private RememberbrallService rememberbrallService;
     @Mock
     private Entry entry;
-    @Mock
-    private Model model;
 
     private static final String ID_EXAMPLE = "00000000-0000-0000-0000-000000000002";
 
@@ -34,20 +32,18 @@ public class RememberbrallControllerTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    //    @Test
-    //    public void forwardToRestDocumentation() {
-    //        ModelAndView modelAndView = rememberbrallController.forwardToRestDocumentation();
-    //        assertThat(modelAndView.getViewName()).isEqualTo("forward:/docs/index.html");
-    //    }
-
     @Test
     public void showAllEntries() {
         //given
         when(rememberbrallService.getAllEntries()).thenReturn(Flux.just(entry, entry, entry));
+
         //when
-        String showAllEntries = rememberbrallController.showAllEntries(model);
+        Flux<Entry> allEntries = rememberbrallController.showAllEntries();
+
         //then
-        assertThat(showAllEntries).isEqualTo("entries");
+        StepVerifier.create(allEntries)
+                .expectNext(entry, entry, entry)
+                .verifyComplete();
     }
 
     @Test

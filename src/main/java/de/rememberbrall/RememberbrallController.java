@@ -7,37 +7,25 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.thymeleaf.spring5.context.webflux.IReactiveDataDriverContextVariable;
-import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Controller
+@RestController
 public class RememberbrallController {
 
     @Autowired
     private RememberbrallService rememberbrallService;
 
-    //        @GetMapping(path = "/")
-    //        public ModelAndView forwardToRestDocumentation() {
-    //            return new ModelAndView("forward:/docs/index.html");
-    //    }
-    //    This is being solved by a workaround in CustomWebFilterClass, see https://github.com/spring-projects/spring-boot/issues/9785
-
-    @GetMapping("/entries")
-    public String showAllEntries(final Model model) {
-        final Flux<Entry> entryStream = this.rememberbrallService.getAllEntries();
-        final IReactiveDataDriverContextVariable entryDriver = new ReactiveDataDriverContextVariable(entryStream, 1, 1);
-        model.addAttribute("entries", entryDriver);
-        return "entries";
+    @GetMapping(path = "/entries", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Flux<Entry> showAllEntries() {
+        return rememberbrallService.getAllEntries();
     }
 
     @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -64,4 +52,5 @@ public class RememberbrallController {
         rememberbrallService.deleteEntry(id).block();
         return ResponseEntity.noContent().build();
     }
+
 }
