@@ -1,8 +1,5 @@
 package de.rememberbrall;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -11,9 +8,7 @@ import org.testng.annotations.Test;
 
 import static io.restassured.RestAssured.given;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import static org.hamcrest.CoreMatchers.containsString;
 
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ThymeleafControllerIT extends AbstractTestNGSpringContextTests {
