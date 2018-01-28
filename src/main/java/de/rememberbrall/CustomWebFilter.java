@@ -16,8 +16,7 @@ public class CustomWebFilter implements WebFilter {
         if (exchange.getRequest().getURI().getPath().equals("/")) {
             ServerHttpRequest mutatedHttpRequest = exchange.getRequest().mutate().path("/docs/index.html").build();
             ServerWebExchange serverWebExchange = exchange.mutate().request(mutatedHttpRequest).build();
-            Mono<Void> filter = chain.filter(serverWebExchange);
-            return filter;
+            return chain.filter(serverWebExchange);
         }
 
         return chain.filter(exchange);
