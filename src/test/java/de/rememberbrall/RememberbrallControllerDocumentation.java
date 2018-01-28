@@ -39,7 +39,7 @@ import reactor.core.publisher.Flux;
 
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RememberbrallControllerDocumentation extends AbstractTestNGSpringContextTests {
-    static final String LINUX_WASCHMITTEL = "Linux Waschmittel";
+    private static final String LINUX_WASCHMITTEL = "Linux Waschmittel";
 
     private ManualRestDocumentation restDocumentation = new ManualRestDocumentation("target/generated-snippets");
 
