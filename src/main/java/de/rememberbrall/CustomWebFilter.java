@@ -1,5 +1,6 @@
 package de.rememberbrall;
 
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -13,7 +14,10 @@ public class CustomWebFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         if (exchange.getRequest().getURI().getPath().equals("/")) {
-            return chain.filter(exchange.mutate().request(exchange.getRequest().mutate().path("/docs/index.html").build()).build());
+            ServerHttpRequest mutatedHttpRequest = exchange.getRequest().mutate().path("/docs/index.html").build();
+            ServerWebExchange serverWebExchange = exchange.mutate().request(mutatedHttpRequest).build();
+            Mono<Void> filter = chain.filter(serverWebExchange);
+            return filter;
         }
 
         return chain.filter(exchange);
