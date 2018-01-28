@@ -95,4 +95,14 @@ public class RememberbrallControllerTest {
         assertThat(deleteEntry.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
+    @Test
+    public void deleteAllEntries() {
+        //given
+        when(rememberbrallService.deleteAllEntries()).thenReturn(Mono.empty());
+        //when
+        ResponseEntity<?> deleteAllEntries = rememberbrallController.deleteAllEntries();
+        //then
+        assertThat(deleteAllEntries.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
 }

@@ -17,6 +17,9 @@ import reactor.test.StepVerifier;
 
 public class RememberbrallServiceTest extends MockitoTest {
 
+    private static final String ENTRY_ID = "00000000-0000-0000-0000-000000000001";
+    private static final String ENTRY_ID_2 = "00000000-0000-0000-0000-000000000002";
+
     private Entry entry;
     private Entry entry2;
 
@@ -29,9 +32,9 @@ public class RememberbrallServiceTest extends MockitoTest {
 
     @BeforeTest
     public void createInitialEntries() throws MalformedURLException {
-        entry = new Entry("00000000-0000-0000-0000-000000000001", "Rekursion in Java", EntryCategory.JAVA,
+        entry = new Entry(ENTRY_ID, "Rekursion in Java", EntryCategory.JAVA,
                 new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-        entry2 = new Entry("00000000-0000-0000-0000-000000000002", "Reactive Testing", EntryCategory.ENTWICKLUNG,
+        entry2 = new Entry(ENTRY_ID_2, "Reactive Testing", EntryCategory.ENTWICKLUNG,
                 new URL("http://projectreactor.io/docs/core/release/reference/docs/index.html#testing"));
     }
 
@@ -92,10 +95,11 @@ public class RememberbrallServiceTest extends MockitoTest {
     @Test
     public void getEntryByID() {
         //given
-        when(entryRepository.findById("00000000-0000-0000-0000-000000000001")).thenReturn(Mono.just(entry));
+        when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(entry));
+
 
         //when
-        Mono<Entry> existingEntry = rememberbrallService.getEntryByID("00000000-0000-0000-0000-000000000001");
+        Mono<Entry> existingEntry = rememberbrallService.getEntryByID(ENTRY_ID);
 
         //then
         StepVerifier
@@ -115,6 +119,36 @@ public class RememberbrallServiceTest extends MockitoTest {
 
         //then
         assertThat(newEntry).isNotNull();
+    }
+
+    @Test
+    public void deleteEntry() {
+        //given
+        when(entryRepository.deleteById(ENTRY_ID)).thenReturn(Mono.empty());
+
+        //when
+        Mono<Void> deleteEntry = rememberbrallService.deleteEntry(ENTRY_ID);
+
+        //then
+        StepVerifier
+                .create(deleteEntry)
+                .expectNextCount(0)
+                .verifyComplete();
+    }
+
+    @Test
+    public void deleteAllEntries() {
+        //given
+        when(entryRepository.deleteAll()).thenReturn(Mono.empty());
+
+        //when
+        Mono<Void> deleteEntry = rememberbrallService.deleteAllEntries();
+
+        //then
+        StepVerifier
+                .create(deleteEntry)
+                .expectNextCount(0)
+                .verifyComplete();
     }
 
 }

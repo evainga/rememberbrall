@@ -47,6 +47,12 @@ public class RememberbrallController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/entries")
+    public ResponseEntity<?> deleteAllEntries() {
+        rememberbrallService.deleteAllEntries().block();
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/entries/{id}")
     public ResponseEntity<?> deleteEntry(@PathVariable String id) {
         rememberbrallService.deleteEntry(id).block();

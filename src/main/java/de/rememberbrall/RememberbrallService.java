@@ -28,4 +28,8 @@ public class RememberbrallService {
         return entryRepository.deleteById(id);
     }
 
+    public Mono<Void> deleteAllEntries() {
+        return entryRepository.deleteAll();
+    }
+
 }
