@@ -1,6 +1,7 @@
 package de.rememberbrall;
 
-import java.net.MalformedURLException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -10,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -47,7 +46,7 @@ public class RememberbrallControllerTest {
     }
 
     @Test
-    public void showSpecificExistingEntry() throws MalformedURLException {
+    public void showSpecificExistingEntry() {
         //given
         when(rememberbrallService.getEntryByID(ID_EXAMPLE)).thenReturn(Mono.just(entry));
 
@@ -59,7 +58,7 @@ public class RememberbrallControllerTest {
     }
 
     @Test
-    public void showSpecificNonExistingEntry() throws MalformedURLException {
+    public void showSpecificNonExistingEntry() {
         //given
         when(rememberbrallService.getEntryByID(ID_EXAMPLE)).thenReturn(Mono.empty());
 
