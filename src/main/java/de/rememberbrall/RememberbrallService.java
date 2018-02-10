@@ -21,7 +21,7 @@ public class RememberbrallService {
     }
 
     public Mono<Entry> createEntry(Entry newEntry) {
-        return entryRepository.insert(newEntry);
+        return entryRepository.save(newEntry);
     }
 
     public Mono<Void> deleteEntry(String id) {

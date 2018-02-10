@@ -1,5 +1,9 @@
 package de.rememberbrall;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.when;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -8,9 +12,6 @@ import org.mockito.Mock;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.when;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -112,7 +113,7 @@ public class RememberbrallServiceTest extends MockitoTest {
     public void createEntry() {
         //given
         Mono<Entry> newMonoEntry = Mono.just(entry);
-        when(entryRepository.insert(entry)).thenReturn(newMonoEntry);
+        when(entryRepository.save(entry)).thenReturn(newMonoEntry);
 
         //when
         Mono<Entry> newEntry = rememberbrallService.createEntry(entry);
