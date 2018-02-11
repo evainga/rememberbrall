@@ -1,24 +1,6 @@
 package de.rememberbrall;
 
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpHeaders;
-import org.springframework.restdocs.ManualRestDocumentation;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import static io.restassured.RestAssured.given;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.empty;
@@ -35,6 +17,25 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
+
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpHeaders;
+import org.springframework.restdocs.ManualRestDocumentation;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import reactor.core.publisher.Flux;
 
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -70,7 +71,10 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
     }
 
     @Test
-    public void showAllEntries() {
+    public void showAllEntries() throws MalformedURLException {
+        getLocationHeaderForCreatedEntry();
+        getLocationHeaderForCreatedEntry();
+
         given(getPlainRequestSpec())
                 .filter(document("show-entries",
                         preprocessResponse(prettyPrint()),
@@ -156,6 +160,18 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                 .get("entries/{id}", locationHeader)
                 .then()
                 .statusCode(404);
+    }
+
+    @Test
+    public void deleteAllEntries() throws MalformedURLException {
+        getLocationHeaderForCreatedEntry();
+
+        given(getPlainRequestSpec())
+                .filter(document("delete-all-entries"))
+                .when()
+                .delete("entries")
+                .then()
+                .statusCode(204);
     }
 
     private String getLocationHeaderForCreatedEntry() throws MalformedURLException {

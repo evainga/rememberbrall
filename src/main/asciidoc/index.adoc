@@ -43,9 +43,11 @@ This endpoint deletes an entry from Rememberbrall.
 
 operation::delete-non-existing-entry[snippets='curl-request,http-request,http-response']
 
-
-
 === Delete a newly created entry
 
 operation::delete-newly-created-entry[snippets='curl-request,http-request,http-response']
+
+== Delete all entries
+
+operation::delete-all-entries[snippets='curl-request,http-request,http-response']
 
