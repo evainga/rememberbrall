@@ -75,7 +75,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                                 fieldWithPath("[0].name").description("The name of an entry"),
                                 fieldWithPath("[0].category").description("The category an entry can be associated with"),
                                 fieldWithPath("[0].url").description("The absolute URL of an entry"))))
-                .accept(ContentType.JSON)
+                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .when()
                 .get("/entries")
                 .then()
@@ -107,7 +107,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                 .expectNext(entry, entry)
                 .verifyComplete();
     }
-    
+
     @Test
     public void createEntry() throws MalformedURLException {
         given(getPlainRequestSpec())
