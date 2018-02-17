@@ -4,7 +4,6 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -22,13 +21,16 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.ManualRestDocumentation;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -37,10 +39,16 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
+@AutoConfigureWebTestClient
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RememberbrallControllerDocumentation extends AbstractTestNGSpringContextTests {
+    @Autowired
+    private WebTestClient webTestClient;
+
     private static final String LINUX_WASCHMITTEL = "Linux Waschmittel";
+    private Entry entry;
 
     private ManualRestDocumentation restDocumentation = new ManualRestDocumentation("target/generated-snippets");
 
@@ -53,21 +61,6 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                 .build()
                 .baseUri("http://localhost")
                 .port(port);
-    }
-
-    @Test
-    public void showAllEntriesReactive() {
-        WebClient client = WebClient.create("http://localhost:" + port);
-        Flux<Entry> result = client
-                .get()
-                .uri("/entries")
-                .accept()
-                .retrieve()
-                .bodyToFlux(Entry.class);
-        System.out.println("==== START ");
-        result.subscribe(System.out::println);
-        System.out.println("==== THE END ");
-//        assertThat(1).isEqualTo(2);
     }
 
     @Test
@@ -87,13 +80,34 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                 .get("/entries")
                 .then()
                 .statusCode(200)
-                .body("$", hasSize(greaterThan(0)))
+                .body("$", hasSize(2))
                 .body("[0].id", both(instanceOf(String.class)).and(not("")))
                 .body("[0].name", both(instanceOf(String.class)).and(not("")))
                 .body("[0].category", both(instanceOf(String.class)).and(not("")))
                 .body("[0].url", both(instanceOf(String.class)).and(not("")));
     }
 
+    @Test
+    public void showAllEntriesReactiveShowCase() throws MalformedURLException {
+        getLocationHeaderForCreatedEntry();
+        getLocationHeaderForCreatedEntry();
+
+        Flux<Entry> allEntries = webTestClient
+                .get()
+                .uri("/entries")
+                .accept(MediaType.APPLICATION_STREAM_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader().contentType("application/stream+json;charset=UTF-8")
+                .returnResult(Entry.class)
+                .getResponseBody();
+
+        StepVerifier.create(allEntries)
+                .expectNext(entry, entry)
+                .verifyComplete();
+    }
+    
     @Test
     public void createEntry() throws MalformedURLException {
         given(getPlainRequestSpec())
@@ -175,7 +189,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
     }
 
     private String getLocationHeaderForCreatedEntry() throws MalformedURLException {
-        Entry entry = new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
+        entry = new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
         return given(getPlainRequestSpec())
                 .when()
                 .body(entry)
@@ -193,7 +207,8 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
     }
 
     @AfterMethod(alwaysRun = true)
-    public void tearDown() {
+    public void tearDown() throws MalformedURLException {
+        deleteAllEntries();
         restDocumentation.afterTest();
     }
 
