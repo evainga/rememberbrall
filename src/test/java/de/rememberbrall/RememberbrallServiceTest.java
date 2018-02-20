@@ -152,4 +152,37 @@ public class RememberbrallServiceTest extends MockitoTest {
                 .verifyComplete();
     }
 
+    @Test
+    public void changeEntryName() throws MalformedURLException {
+        //given
+        when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(entry));
+
+        //when
+        rememberbrallService.changeEntry(ENTRY_ID, "New Entry Name", null, null);
+
+        //then
+        assertThat(entry.getName()).isEqualTo("New Entry Name");
+        assertThat(entry.getUrl()).isEqualTo(new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
+        assertThat(entry.getCategory()).isEqualTo(EntryCategory.JAVA);
+    }
+
+    @Test
+    public void changeEntryCompletely() throws MalformedURLException {
+        //given
+        when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(entry));
+
+        //when
+        rememberbrallService.changeEntry(ENTRY_ID, "New Entry Name", new URL("http://www.new-url.de"), EntryCategory.LINUX);
+
+        //then
+        assertThat(entry.getName()).isEqualTo("New Entry Name");
+        assertThat(entry.getUrl()).isEqualTo(new URL("http://www.new-url.de"));
+        assertThat(entry.getCategory()).isEqualTo(EntryCategory.LINUX);
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void changeEntryWithoutId() {
+        rememberbrallService.changeEntry(null, "New Entry Name", null, null);
+    }
+
 }
