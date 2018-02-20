@@ -202,7 +202,6 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                         preprocessResponse(prettyPrint()),
                         pathParameters(parameterWithName("id").description("The ID of an entry"))))
                 .contentType(ContentType.JSON)
-                .log().all()
                 .put("entries/{id}")
                 .then()
                 .statusCode(200)

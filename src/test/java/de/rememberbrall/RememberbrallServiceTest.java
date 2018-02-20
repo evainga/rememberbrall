@@ -197,11 +197,4 @@ public class RememberbrallServiceTest extends MockitoTest {
                 .create(nonExistingEntry)
                 .verifyComplete();
     }
-
-    @Test(expectedExceptions = NullPointerException.class)
-    public void updateEntryWithoutId() throws MalformedURLException {
-        rememberbrallService.updateEntry(null, new Entry("New Entry Name", EntryCategory.JAVA,
-                new URL("http://non-existing.com")));
-    }
-
 }
