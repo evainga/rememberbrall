@@ -24,6 +24,7 @@ public class RememberbrallControllerTest {
     @Mock
     private Entry entry;
 
+
     private static final String ID_EXAMPLE = "00000000-0000-0000-0000-000000000002";
 
     @BeforeTest
@@ -72,12 +73,12 @@ public class RememberbrallControllerTest {
     @Test
     public void createEntry() {
         //given
-        Mono<Entry> entryAsMono = Mono.just(this.entry);
-        when(rememberbrallService.createEntry(this.entry)).thenReturn(entryAsMono);
+        Mono<Entry> entryAsMono = Mono.just(entry);
+        when(rememberbrallService.createEntry(entry)).thenReturn(entryAsMono);
         when(entryAsMono.block().getId()).thenReturn(ID_EXAMPLE);
 
         //when
-        ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(this.entry);
+        ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(entry);
 
         //then
         assertThat(newEntry.getStatusCode()).isSameAs(HttpStatus.CREATED);
@@ -102,6 +103,30 @@ public class RememberbrallControllerTest {
         ResponseEntity<?> deleteAllEntries = rememberbrallController.deleteAllEntries();
         //then
         assertThat(deleteAllEntries.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void updateEntry() {
+        //given
+        when(rememberbrallService.updateEntry(ID_EXAMPLE, "new Name", null, null)).thenReturn(Mono.just(entry));
+
+        //when
+        ResponseEntity<Entry> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, "new Name", null, null);
+
+        //then
+        assertThat(updatedEntry.getStatusCode()).isSameAs(HttpStatus.OK);
+    }
+
+    @Test
+    public void updateNonExistingEntry() {
+        //given
+        when(rememberbrallService.updateEntry(ID_EXAMPLE, "new Name", null, null)).thenReturn(Mono.empty());
+
+        //when
+        ResponseEntity<Entry> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, "new Name", null, null);
+
+        //then
+        assertThat(updatedEntry.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
 }

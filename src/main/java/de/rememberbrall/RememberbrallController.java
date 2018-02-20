@@ -1,5 +1,7 @@
 package de.rememberbrall;
 
+import java.net.URL;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import reactor.core.publisher.Flux;
@@ -59,4 +63,19 @@ public class RememberbrallController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/entries/{id}")
+    public ResponseEntity<Entry> updateEntry(
+            @PathVariable String id,
+            @RequestParam String name,
+            @RequestParam URL url,
+            @RequestParam EntryCategory category) {
+
+        Mono<Entry> updateEntry = rememberbrallService.updateEntry(id, name, url, category);
+
+        if (updateEntry.hasElement().block()) {
+            return ResponseEntity.ok(updateEntry.block());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
