@@ -168,22 +168,6 @@ public class RememberbrallServiceTest extends MockitoTest {
     }
 
     @Test
-    public void updateEntryName() throws MalformedURLException {
-        //given
-        Entry entry = new Entry(ENTRY_ID, "Rekursion in Java", EntryCategory.JAVA,
-                new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-        when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(entry));
-
-        //when
-        rememberbrallService.updateEntry(ENTRY_ID, "New Entry Name", null, null);
-
-        //then
-        assertThat(entry.getName()).isEqualTo("New Entry Name");
-        assertThat(entry.getUrl()).isEqualTo(new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-        assertThat(entry.getCategory()).isEqualTo(EntryCategory.JAVA);
-    }
-
-    @Test
     public void updateEntryCompletely() throws MalformedURLException {
         //given
         Entry entry = new Entry(ENTRY_ID, "Rekursion in Java", EntryCategory.JAVA,
@@ -191,7 +175,7 @@ public class RememberbrallServiceTest extends MockitoTest {
         when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(entry));
 
         //when
-        rememberbrallService.updateEntry(ENTRY_ID, "New Entry Name", new URL("http://www.new-url.de"), EntryCategory.LINUX);
+        rememberbrallService.updateEntry(ENTRY_ID, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")));
 
         //then
         assertThat(entry.getName()).isEqualTo("New Entry Name");
@@ -205,7 +189,8 @@ public class RememberbrallServiceTest extends MockitoTest {
         when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.empty());
 
         //when
-        Mono<Entry> nonExistingEntry = rememberbrallService.updateEntry(ENTRY_ID, "New Entry Name", new URL("http://www.new-url.de"), EntryCategory.LINUX);
+        Mono<Entry> nonExistingEntry = rememberbrallService.updateEntry(ENTRY_ID, new Entry("New Entry Name", EntryCategory.JAVA,
+                new URL("http://non-existing.com")));
 
         //then
         StepVerifier
@@ -214,8 +199,9 @@ public class RememberbrallServiceTest extends MockitoTest {
     }
 
     @Test(expectedExceptions = NullPointerException.class)
-    public void updateEntryWithoutId() {
-        rememberbrallService.updateEntry(null, "New Entry Name", null, null);
+    public void updateEntryWithoutId() throws MalformedURLException {
+        rememberbrallService.updateEntry(null, new Entry("New Entry Name", EntryCategory.JAVA,
+                new URL("http://non-existing.com")));
     }
 
 }

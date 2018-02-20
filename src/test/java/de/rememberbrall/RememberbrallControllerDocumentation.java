@@ -14,6 +14,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
@@ -188,6 +190,28 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                 .statusCode(204);
     }
 
+    @Test
+    public void updateSpecificEntry() throws MalformedURLException {
+        String locationHeader = getLocationHeaderForCreatedEntry();
+
+        given(getPlainRequestSpec())
+                .when()
+                .pathParam("id", locationHeader)
+                .body(new Entry("New Entry Name", EntryCategory.JAVA, new URL("http://www.new-url.de")))
+                .filter(document("update-specific-entry",
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(parameterWithName("id").description("The ID of an entry"))))
+                .contentType(ContentType.JSON)
+                .log().all()
+                .put("entries/{id}")
+                .then()
+                .statusCode(200)
+                .body("id", any(String.class))
+                .body("name", is("New Entry Name"))
+                .body("category", is("JAVA"))
+                .body("url", is("http://www.new-url.de"));
+    }
+
     private String getLocationHeaderForCreatedEntry() throws MalformedURLException {
         entry = new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
         return given(getPlainRequestSpec())
@@ -211,5 +235,4 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
         deleteAllEntries();
         restDocumentation.afterTest();
     }
-
 }

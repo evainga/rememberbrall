@@ -51,3 +51,7 @@ operation::delete-newly-created-entry[snippets='curl-request,http-request,http-r
 
 operation::delete-all-entries[snippets='curl-request,http-request,http-response']
 
+== Update an entry
+
+operation::update-specific-entry[snippets='curl-request,path-parameters,http-request,http-response']
+

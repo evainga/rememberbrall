@@ -3,6 +3,9 @@ package de.rememberbrall;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -106,24 +109,24 @@ public class RememberbrallControllerTest {
     }
 
     @Test
-    public void updateEntry() {
+    public void updateEntry() throws MalformedURLException {
         //given
-        when(rememberbrallService.updateEntry(ID_EXAMPLE, "new Name", null, null)).thenReturn(Mono.just(entry));
+        when(rememberbrallService.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")))).thenReturn(Mono.just(entry));
 
         //when
-        ResponseEntity<Entry> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, "new Name", null, null);
+        ResponseEntity<Entry> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")));
 
         //then
         assertThat(updatedEntry.getStatusCode()).isSameAs(HttpStatus.OK);
     }
 
     @Test
-    public void updateNonExistingEntry() {
+    public void updateNonExistingEntry() throws MalformedURLException {
         //given
-        when(rememberbrallService.updateEntry(ID_EXAMPLE, "new Name", null, null)).thenReturn(Mono.empty());
+        when(rememberbrallService.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")))).thenReturn(Mono.empty());
 
         //when
-        ResponseEntity<Entry> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, "new Name", null, null);
+        ResponseEntity<Entry> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")));
 
         //then
         assertThat(updatedEntry.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);

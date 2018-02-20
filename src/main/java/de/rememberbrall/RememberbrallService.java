@@ -1,7 +1,5 @@
 package de.rememberbrall;
 
-import java.net.URL;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,22 +32,17 @@ public class RememberbrallService {
         return entryRepository.deleteAll();
     }
 
-    public Mono<Entry> updateEntry(String id, String newName, URL newUrl, EntryCategory newEntryCategory) {
+    public Mono<Entry> updateEntry(String id, Entry entry) {
         Mono<Entry> entryById = entryRepository.findById(id);
 
         if (entryById.equals(Mono.empty())) {
             return entryById;
         } else {
-            if (newName != null) {
-                entryById.block().setName(newName);
-            }
-            if (newUrl != null) {
-                entryById.block().setUrl(newUrl);
-            }
-            if (newEntryCategory != null) {
-                entryById.block().setCategory(newEntryCategory);
-            }
-            return entryRepository.save(entryById.block());
+            Entry newEntry = entryById.block();
+            newEntry.setName(entry.getName());
+            newEntry.setUrl(entry.getUrl());
+            newEntry.setCategory(entry.getCategory());
+            return entryRepository.save(newEntry);
         }
     }
 
