@@ -105,7 +105,22 @@ public class RememberbrallServiceTest extends MockitoTest {
         //then
         StepVerifier
                 .create(existingEntry)
-                .expectNextMatches(e -> e.equals(this.entry))
+                .expectNextMatches(e -> e.equals(entry))
+                .verifyComplete();
+    }
+
+    @Test
+    public void getNonExistingEntry() {
+        //given
+        when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.empty());
+
+
+        //when
+        Mono<Entry> nonExistingEntry = rememberbrallService.getEntryByID(ENTRY_ID);
+
+        //then
+        StepVerifier
+                .create(nonExistingEntry)
                 .verifyComplete();
     }
 
@@ -155,6 +170,8 @@ public class RememberbrallServiceTest extends MockitoTest {
     @Test
     public void updateEntryName() throws MalformedURLException {
         //given
+        Entry entry = new Entry(ENTRY_ID, "Rekursion in Java", EntryCategory.JAVA,
+                new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
         when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(entry));
 
         //when
@@ -169,6 +186,8 @@ public class RememberbrallServiceTest extends MockitoTest {
     @Test
     public void updateEntryCompletely() throws MalformedURLException {
         //given
+        Entry entry = new Entry(ENTRY_ID, "Rekursion in Java", EntryCategory.JAVA,
+                new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
         when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(entry));
 
         //when
@@ -178,6 +197,20 @@ public class RememberbrallServiceTest extends MockitoTest {
         assertThat(entry.getName()).isEqualTo("New Entry Name");
         assertThat(entry.getUrl()).isEqualTo(new URL("http://www.new-url.de"));
         assertThat(entry.getCategory()).isEqualTo(EntryCategory.LINUX);
+    }
+
+    @Test
+    public void updateNonExistingEntry() throws MalformedURLException {
+        //given
+        when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.empty());
+
+        //when
+        Mono<Entry> nonExistingEntry = rememberbrallService.updateEntry(ENTRY_ID, "New Entry Name", new URL("http://www.new-url.de"), EntryCategory.LINUX);
+
+        //then
+        StepVerifier
+                .create(nonExistingEntry)
+                .verifyComplete();
     }
 
     @Test(expectedExceptions = NullPointerException.class)
