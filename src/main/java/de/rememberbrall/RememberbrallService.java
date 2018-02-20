@@ -34,20 +34,20 @@ public class RememberbrallService {
         return entryRepository.deleteAll();
     }
 
-    public Mono<Entry> changeEntry(String id, String newName, URL newUrl, EntryCategory newEntryCategory) {
-        Entry changeEntry = entryRepository.findById(id).block();
+    public Mono<Entry> updateEntry(String id, String newName, URL newUrl, EntryCategory newEntryCategory) {
+        Entry updateEntry = entryRepository.findById(id).block();
 
         if (newName != null) {
-            changeEntry.setName(newName);
+            updateEntry.setName(newName);
         }
         if (newUrl != null) {
-            changeEntry.setUrl(newUrl);
+            updateEntry.setUrl(newUrl);
         }
         if (newEntryCategory != null) {
-            changeEntry.setCategory(newEntryCategory);
+            updateEntry.setCategory(newEntryCategory);
         }
 
-        return entryRepository.save(changeEntry);
+        return entryRepository.save(updateEntry);
     }
 
 }
