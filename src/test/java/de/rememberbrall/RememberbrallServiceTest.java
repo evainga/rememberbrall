@@ -105,7 +105,7 @@ public class RememberbrallServiceTest extends MockitoTest {
         //then
         StepVerifier
                 .create(existingEntry)
-                .expectNextMatches(e -> e.equals(entry))
+                .expectNextMatches(entry::equals)
                 .verifyComplete();
     }
 

@@ -130,7 +130,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
 
     @Test
     public void createAndShowSpecificEntry() throws MalformedURLException {
-        String locationHeader = getLocationHeaderForCreatedEntry();
+        String locationHeaderForCreatedEntry = getLocationHeaderForCreatedEntry();
 
         given(getPlainRequestSpec())
                 .filter(document("show-specific-entry",
@@ -141,7 +141,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                                 fieldWithPath("url").description("The absolute URL of an entry"))))
                 .accept(ContentType.JSON)
                 .when()
-                .get("entries/{id}", locationHeader)
+                .get("entries/{id}", locationHeaderForCreatedEntry)
                 .then()
                 .statusCode(200)
                 .body("id", any(String.class))
@@ -162,18 +162,18 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
 
     @Test
     public void deleteNewlyCreatedEntry() throws MalformedURLException {
-        String locationHeader = getLocationHeaderForCreatedEntry();
+        String locationHeaderForCreatedEntry = getLocationHeaderForCreatedEntry();
 
         given(getPlainRequestSpec())
                 .filter(document("delete-newly-created-entry"))
                 .when()
-                .delete("entries/{id}", locationHeader)
+                .delete("entries/{id}", locationHeaderForCreatedEntry)
                 .then()
                 .statusCode(204);
 
         given(getPlainRequestSpec())
                 .when()
-                .get("entries/{id}", locationHeader)
+                .get("entries/{id}", locationHeaderForCreatedEntry)
                 .then()
                 .statusCode(404);
     }
@@ -192,11 +192,11 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
 
     @Test
     public void updateSpecificEntry() throws MalformedURLException {
-        String locationHeader = getLocationHeaderForCreatedEntry();
+        String locationHeaderForCreatedEntry = getLocationHeaderForCreatedEntry();
 
         given(getPlainRequestSpec())
                 .when()
-                .pathParam("id", locationHeader)
+                .pathParam("id", locationHeaderForCreatedEntry)
                 .body(new Entry("New Entry Name", EntryCategory.JAVA, new URL("http://www.new-url.de")))
                 .filter(document("update-specific-entry",
                         preprocessResponse(prettyPrint()),
