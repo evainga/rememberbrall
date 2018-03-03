@@ -24,11 +24,13 @@ public class RememberbrallController {
     @Autowired
     private RememberbrallService rememberbrallService;
 
+    @TrackTime
     @GetMapping(path = "/entries", produces = { MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.APPLICATION_STREAM_JSON_VALUE })
     public Flux<Entry> showAllEntries() {
         return rememberbrallService.getAllEntries();
     }
 
+    @TrackTime
     @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Entry> showSpecificEntry(@PathVariable String id) {
         Mono<Entry> mono = rememberbrallService.getEntryByID(id);
@@ -40,6 +42,7 @@ public class RememberbrallController {
         }
     }
 
+    @TrackTime
     @PostMapping("/entries")
     public ResponseEntity<Entry> createEntry(@Valid @RequestBody Entry entry) {
         String id = rememberbrallService.createEntry(entry).block().getId();
@@ -48,18 +51,21 @@ public class RememberbrallController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
+    @TrackTime
     @DeleteMapping("/entries")
     public ResponseEntity<?> deleteAllEntries() {
         rememberbrallService.deleteAllEntries().block();
         return ResponseEntity.noContent().build();
     }
 
+    @TrackTime
     @DeleteMapping("/entries/{id}")
     public ResponseEntity<?> deleteEntry(@PathVariable String id) {
         rememberbrallService.deleteEntry(id).block();
         return ResponseEntity.noContent().build();
     }
 
+    @TrackTime
     @PutMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Entry> updateEntry(
             @PathVariable String id,
