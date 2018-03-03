@@ -67,8 +67,8 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
 
     @Test
     public void showAllEntries() throws MalformedURLException {
-        getLocationHeaderForCreatedEntry();
-        getLocationHeaderForCreatedEntry();
+        getIdForCreatedEntry();
+        getIdForCreatedEntry();
 
         given(getPlainRequestSpec())
                 .filter(document("show-entries",
@@ -91,8 +91,8 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
 
     @Test
     public void showAllEntriesReactiveShowCase() throws MalformedURLException {
-        getLocationHeaderForCreatedEntry();
-        getLocationHeaderForCreatedEntry();
+        getIdForCreatedEntry();
+        getIdForCreatedEntry();
 
         Flux<Entry> allEntries = webTestClient
                 .get()
@@ -130,7 +130,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
 
     @Test
     public void createAndShowSpecificEntry() throws MalformedURLException {
-        String locationHeaderForCreatedEntry = getLocationHeaderForCreatedEntry();
+        String idForCreatedEntry = getIdForCreatedEntry();
 
         given(getPlainRequestSpec())
                 .filter(document("show-specific-entry",
@@ -141,7 +141,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                                 fieldWithPath("url").description("The absolute URL of an entry"))))
                 .accept(ContentType.JSON)
                 .when()
-                .get("entries/{id}", locationHeaderForCreatedEntry)
+                .get("entries/{id}", idForCreatedEntry)
                 .then()
                 .statusCode(200)
                 .body("id", any(String.class))
@@ -162,25 +162,25 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
 
     @Test
     public void deleteNewlyCreatedEntry() throws MalformedURLException {
-        String locationHeaderForCreatedEntry = getLocationHeaderForCreatedEntry();
+        String idForCreatedEntry = getIdForCreatedEntry();
 
         given(getPlainRequestSpec())
                 .filter(document("delete-newly-created-entry"))
                 .when()
-                .delete("entries/{id}", locationHeaderForCreatedEntry)
+                .delete("entries/{id}", idForCreatedEntry)
                 .then()
                 .statusCode(204);
 
         given(getPlainRequestSpec())
                 .when()
-                .get("entries/{id}", locationHeaderForCreatedEntry)
+                .get("entries/{id}", idForCreatedEntry)
                 .then()
                 .statusCode(404);
     }
 
     @Test
     public void deleteAllEntries() throws MalformedURLException {
-        getLocationHeaderForCreatedEntry();
+        getIdForCreatedEntry();
 
         given(getPlainRequestSpec())
                 .filter(document("delete-all-entries"))
@@ -192,11 +192,11 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
 
     @Test
     public void updateSpecificEntry() throws MalformedURLException {
-        String locationHeaderForCreatedEntry = getLocationHeaderForCreatedEntry();
+        String idForCreatedEntry = getIdForCreatedEntry();
 
         given(getPlainRequestSpec())
                 .when()
-                .pathParam("id", locationHeaderForCreatedEntry)
+                .pathParam("id", idForCreatedEntry)
                 .body(new Entry("New Entry Name", EntryCategory.JAVA, new URL("http://www.new-url.de")))
                 .filter(document("update-specific-entry",
                         preprocessResponse(prettyPrint()),
@@ -211,7 +211,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                 .body("url", is("http://www.new-url.de"));
     }
 
-    private String getLocationHeaderForCreatedEntry() throws MalformedURLException {
+    private String getIdForCreatedEntry() throws MalformedURLException {
         entry = new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
         return given(getPlainRequestSpec())
                 .when()
