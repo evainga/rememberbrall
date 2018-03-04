@@ -5,16 +5,16 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 
 @Aspect
-@Configuration
+@Component
 public class MethodExecutionTimeAspect {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Around("@annotation(de.rememberbrall.TrackTime)")
-    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object measureMethodExecutionTimes(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
         Object returnObj = joinPoint.proceed();
         long timeTaken = System.currentTimeMillis() - startTime;
