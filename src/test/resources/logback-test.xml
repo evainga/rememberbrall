@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{45} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="IN_MEMORY" class="de.rememberbrall.logging.MemoryAppender">
+	</appender>
+
+	<logger name="de.rememberbrall.MethodExecutionTimeAspect" level="INFO" additivity="true">
+		<appender-ref ref="IN_MEMORY" />
+	</logger>
+
+	<logger name="de.rememberbrall" level="INFO" />
+
+	<root level="WARN">
+		<appender-ref ref="CONSOLE" />
+	</root>
+</configuration>
