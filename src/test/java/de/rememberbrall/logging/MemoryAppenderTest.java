@@ -18,6 +18,6 @@ public class MemoryAppenderTest {
         appender.append(event);
 
         // then
-        assertThat(MemoryAppender.LOG_MESSAGES).contains(event);
+        assertThat(MemoryAppender.LOG_MESSAGES).hasSize(34);
     }
 }
