@@ -7,6 +7,6 @@ nice and green like always: [![Build Status](https://travis-ci.org/evainga/remem
 [![codecov](https://codecov.io/gh/evainga/rememberbrall/branch/master/graph/badge.svg)](https://codecov.io/gh/evainga/rememberbrall)
 
 ## The start is
-very easy. After you clone or fork the project, just use ```mvn clean package spring-boot:run``` to start the programme. You can also check out the endpoints described in the documentation under https://rememberbrall.herokuapp.com.
+very easy. After you clone or fork the project, just use ```mvn clean package spring-boot:run``` to start the program. You can also check out the endpoints described in the documentation under https://rememberbrall.herokuapp.com.
 
 

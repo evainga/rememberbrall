@@ -11,7 +11,7 @@
 = API documentation of Rememberbrall
 Eva Göttert
 
-This artifact holds integration tests for Rememberbrall and generates living documentation from this programme. In the next chapters, `de.rememberbrall.RememberbrallController` is being documented with its respective request and response semantics.
+This artifact holds integration tests for Rememberbrall and generates living documentation from this program. In the next chapters, `de.rememberbrall.RememberbrallController` is being documented with its respective request and response semantics.
 
 Additionally you can check out a Thymeleaf representation of all entries under link:/thymeleaf-entries[Rememberbrall Entries with Thymeleaf]
 
