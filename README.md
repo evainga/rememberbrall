@@ -1,5 +1,5 @@
 # Rememberbrall is
-a tiny little programme which helps to remember interesting stuff. Mostly it is a learning project to further develop my programming skills. Technologies like the newest Spring Boot 2.0.0 Milestone, Spring REST Docs, Heroku, AssertJ and Webflux are used.
+a little program which helps to remember interesting stuff. Mostly it is a learning project to further develop my programming skills. Technologies like Spring Boot 2, Spring REST Docs, Heroku, AssertJ and Webflux are used.
 
 ## The current build is
 nice and green like always: [![Build Status](https://travis-ci.org/evainga/rememberbrall.svg?branch=master)](https://travis-ci.org/evainga/rememberbrall) 
@@ -7,6 +7,6 @@ nice and green like always: [![Build Status](https://travis-ci.org/evainga/remem
 [![codecov](https://codecov.io/gh/evainga/rememberbrall/branch/master/graph/badge.svg)](https://codecov.io/gh/evainga/rememberbrall)
 
 ## The start is
-very easy. After you clone or fork the project, just use ```mvn clean spring-boot:run``` to start the programme. You can also check out the endpoints described in the documentation under https://rememberbrall.herokuapp.com.
+very easy. After you clone or fork the project, just use ```mvn clean package spring-boot:run``` to start the programme. You can also check out the endpoints described in the documentation under https://rememberbrall.herokuapp.com.
 
 
