@@ -101,7 +101,7 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectHeader().contentType("application/stream+json;charset=UTF-8")
+                .expectHeader().contentType(MediaType.APPLICATION_STREAM_JSON)
                 .returnResult(Entry.class)
                 .getResponseBody();
 
