@@ -7,16 +7,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Override
     public void configure(WebSecurity web) {
         web
                 .ignoring()
-                .antMatchers(HttpMethod.GET)
-                .antMatchers(HttpMethod.POST)
                 .antMatchers(HttpMethod.OPTIONS);
     }
 
@@ -31,23 +32,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.TRACE, "/actuator/**").hasRole("ADMIN");
+                .antMatchers("/thymeleaf-entries").permitAll()
+                .antMatchers("/entries/**").hasRole("USER")
+                .anyRequest().authenticated()
+                .and()
+                .formLogin();
     }
 
+
     @Bean
-    /** Because we rely on LDAP auth we have to process the plain password */
-    public static PasswordEncoder passwordEncoder() {
-        return new PasswordEncoder() {
-
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return rawPassword.toString().equals(encodedPassword);
-            }
-        };
+    public UserDetailsService userDetailsService() {
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        manager.createUser(User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build());
+        return manager;
     }
 }

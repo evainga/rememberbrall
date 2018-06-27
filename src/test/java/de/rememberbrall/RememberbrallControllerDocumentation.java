@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -31,6 +32,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.ManualRestDocumentation;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testng.annotations.AfterMethod;
@@ -44,6 +47,8 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 @AutoConfigureWebTestClient
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration
 @SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RememberbrallControllerDocumentation extends AbstractTestNGSpringContextTests {
     @Autowired
