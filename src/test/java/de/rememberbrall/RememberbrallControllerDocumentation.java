@@ -1,100 +1,171 @@
 package de.rememberbrall;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.any;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static de.rememberbrall.SecurityConfig.ADMIN;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
+import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.ManualRestDocumentation;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@SpringBootTest
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = RememberbrallApplication.class)
 @AutoConfigureWebTestClient
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = RememberbrallApplication.class)
-@SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-public class RememberbrallControllerDocumentation extends AbstractTestNGSpringContextTests {
+public class RememberbrallControllerDocumentation {
+
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+
     @Autowired
+    ApplicationContext context;
+
     private WebTestClient webTestClient;
 
     private static final String LINUX_WASCHMITTEL = "Linux Waschmittel";
     private Entry entry;
+    private Entry newEntry;
 
-    private ManualRestDocumentation restDocumentation = new ManualRestDocumentation("target/generated-snippets");
 
-    @Value("${local.server.port}")
-    private int port;
+    @Before
+    public void setup() throws MalformedURLException {
+        entry = new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
+        newEntry = new Entry("New Entry Name", EntryCategory.JAVA, new URL("http://www.new-url.de"));
 
-    public RequestSpecification getPlainRequestSpec() {
-        return new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(restDocumentation).snippets().withEncoding("UTF-8"))
+        this.webTestClient = WebTestClient
+                .bindToApplicationContext(context)
+                .apply(SecurityMockServerConfigurers.springSecurity())
+                .configureClient()
+                .filter(documentationConfiguration(restDocumentation).snippets().withEncoding("UTF-8"))
+                .filter(basicAuthentication())
                 .build()
-                .baseUri("http://localhost")
-                .port(port);
+                .mutateWith(csrf());
     }
 
     @Test
-    public void showAllEntries() throws MalformedURLException {
+    public void createEntry() {
+        webTestClient
+                .post()
+                .uri("/entries")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(Mono.just(entry), Entry.class)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectHeader()
+                .valueMatches(HttpHeaders.LOCATION, "^((?!null).)+$")
+                .expectBody()
+                .consumeWith(document("create-entry",
+                        preprocessRequest(prettyPrint()),
+                        requestFields(fieldWithPath("id").description("The ID of an entry"),
+                                fieldWithPath("name").description("The given name of the entry"),
+                                fieldWithPath("category").description("The given name of the entry"),
+                                fieldWithPath("url").description("The given name of the entry"))));
+    }
+
+    @Test
+    public void getSpecificEntry() {
+        String idForCreatedEntry = getIdForCreatedEntry();
+
+        webTestClient
+                .get()
+                .uri("/entries/" + idForCreatedEntry)
+                .exchange()
+                .expectBody().consumeWith(document("get-specific-entry",
+                preprocessResponse(prettyPrint()),
+                responseFields(fieldWithPath("id").description("The ID of an entry"),
+                        fieldWithPath("name").description("The name of an entry"),
+                        fieldWithPath("category").description("The category an entry can be associated with"),
+                        fieldWithPath("url").description("The absolute URL of an entry"))))
+                .jsonPath("id").exists()
+                .jsonPath("name").isEqualTo(LINUX_WASCHMITTEL)
+                .jsonPath("category").isEqualTo("LINUX")
+                .jsonPath("url").isEqualTo("https://de.wikipedia.org/wiki/Linux_(Waschmittel)");
+    }
+
+
+    @Test
+    public void updateSpecificEntry() {
+        String idForCreatedEntry = getIdForCreatedEntry();
+
+        webTestClient
+                .put()
+                .uri("/entries/" + idForCreatedEntry)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(Mono.just(newEntry), Entry.class)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .consumeWith(document("update-specific-entry",
+                        preprocessResponse(prettyPrint()),
+                        requestFields(fieldWithPath("id").description("The ID of an entry"),
+                                fieldWithPath("name").description("The name of an entry"),
+                                fieldWithPath("category").description("The category an entry can be associated with"),
+                                fieldWithPath("url").description("The absolute URL of an entry"))))
+                .jsonPath("id").exists()
+                .jsonPath("name").isEqualTo("New Entry Name")
+                .jsonPath("category").isEqualTo("JAVA")
+                .jsonPath("url").isEqualTo("http://www.new-url.de");
+    }
+
+    @Test
+    public void getAllEntries() {
+        deleteAllEntriesWithAdminRights();
+
         getIdForCreatedEntry();
         getIdForCreatedEntry();
 
-        given(getPlainRequestSpec())
-                .filter(document("show-entries",
+        webTestClient
+                .get()
+                .uri("entries")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(Entry.class)
+                .hasSize(2)
+                .consumeWith(document("get-all-entries",
                         preprocessResponse(prettyPrint()),
                         responseFields(fieldWithPath("[0].id").description("The ID of an entry"),
                                 fieldWithPath("[0].name").description("The name of an entry"),
                                 fieldWithPath("[0].category").description("The category an entry can be associated with"),
-                                fieldWithPath("[0].url").description("The absolute URL of an entry"))))
-                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .when()
-                .get("/entries")
-                .then()
-                .statusCode(200)
-                .body("$", hasSize(2))
-                .body("[0].id", both(instanceOf(String.class)).and(not("")))
-                .body("[0].name", both(instanceOf(String.class)).and(not("")))
-                .body("[0].category", both(instanceOf(String.class)).and(not("")))
-                .body("[0].url", both(instanceOf(String.class)).and(not("")));
-
+                                fieldWithPath("[0].url").description("The absolute URL of an entry"))));
     }
 
     @Test
-    public void showAllEntriesReactiveShowCase() throws MalformedURLException {
-        deleteAllEntries();
+    public void getAllEntriesReactiveShowCase() {
+        deleteAllEntriesWithAdminRights();
+
         getIdForCreatedEntry();
         getIdForCreatedEntry();
 
@@ -112,138 +183,79 @@ public class RememberbrallControllerDocumentation extends AbstractTestNGSpringCo
         StepVerifier.create(allEntries)
                 .expectNext(entry, entry)
                 .verifyComplete();
-
     }
 
     @Test
-    public void createEntry() throws MalformedURLException {
-        given(getPlainRequestSpec())
-                .filter(document("create-entry",
-                        preprocessRequest(prettyPrint()),
-                        requestFields(fieldWithPath("id").description("The ID of an entry"),
-                                fieldWithPath("name").description("The given name of the entry"),
-                                fieldWithPath("category").description("The given name of the entry"),
-                                fieldWithPath("url").description("The given name of the entry"))))
-                .when()
-                .body(new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)")))
-                .contentType(ContentType.JSON)
-                .post("entries")
-                .then()
-                .statusCode(201)
-                .header(HttpHeaders.LOCATION, not(empty()));
+    public void deleteSingleEntry() {
 
-    }
-
-    @Test
-    public void createAndShowSpecificEntry() throws MalformedURLException {
         String idForCreatedEntry = getIdForCreatedEntry();
 
-        given(getPlainRequestSpec())
-                .filter(document("show-specific-entry",
-                        preprocessResponse(prettyPrint()),
-                        responseFields(fieldWithPath("id").description("The ID of an entry"),
-                                fieldWithPath("name").description("The name of an entry"),
-                                fieldWithPath("category").description("The category an entry can be associated with"),
-                                fieldWithPath("url").description("The absolute URL of an entry"))))
-                .accept(ContentType.JSON)
-                .when()
-                .get("entries/{id}", idForCreatedEntry)
-                .then()
-                .statusCode(200)
-                .body("id", any(String.class))
-                .body("name", is(LINUX_WASCHMITTEL))
-                .body("category", is("LINUX"))
-                .body("url", is("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
+        webTestClient
+                .delete()
+                .uri("/entries/" + idForCreatedEntry)
+                .exchange()
+                .expectStatus()
+                .isNoContent()
+                .expectBody()
+                .consumeWith(document("delete-created-entry"));
 
+        webTestClient
+                .delete()
+                .uri("/entries/" + idForCreatedEntry)
+                .exchange()
+                .expectStatus()
+                .isNoContent(); //TODO: Make it more concrete with Not Found
     }
 
     @Test
-    public void deleteNonExistingEntry() throws MalformedURLException {
-        given(getPlainRequestSpec())
-                .filter(document("delete-non-existing-entry"))
-                .when()
-                .delete("entries/{id}", "dummyId")
-                .then()
-                .statusCode(200); //TODO
-
+    public void deleteNonExistingEntry() {
+        webTestClient
+                .delete()
+                .uri("/entries/" + "non-existing-id")
+                .exchange()
+                .expectStatus()
+                .isNoContent()//TODO: Make it more concrete with Not Found
+                .expectBody()
+                .consumeWith(document("delete-non-existing-entry"));
     }
 
     @Test
-    public void deleteNewlyCreatedEntry() throws MalformedURLException {
-        String idForCreatedEntry = getIdForCreatedEntry();
-
-        given(getPlainRequestSpec())
-                .filter(document("delete-newly-created-entry"))
-                .when()
-                .delete("entries/{id}", idForCreatedEntry)
-                .then()
-                .statusCode(200); //TODO
-
-        given(getPlainRequestSpec())
-                .when()
-                .get("entries/{id}", idForCreatedEntry)
-                .then()
-                .statusCode(404);
-
-    }
-
-    @Test
-//    @WithMockUser(roles = "ADMIN")
-    public void deleteAllEntries() throws MalformedURLException {
+    public void deleteAllEntriesWithAdminRights() {
         getIdForCreatedEntry();
 
-        given(getPlainRequestSpec())
-                .filter(document("delete-all-entries"))
-                .when()
-                .log().all()
-                .delete("/entries")
-                .then()
-                .statusCode(200); // TODO
-
+        webTestClient
+                .mutateWith(mockUser().roles(ADMIN))
+                .delete()
+                .uri("/entries")
+                .exchange()
+                .expectStatus()
+                .isNoContent()
+                .expectBody()
+                .consumeWith(document("delete-all-entries"));
     }
 
     @Test
-    public void updateSpecificEntry() throws MalformedURLException {
-        String idForCreatedEntry = getIdForCreatedEntry();
+    public void forbidToDeleteAllEntriesWithNoAdminRights() {
+        getIdForCreatedEntry();
 
-        given(getPlainRequestSpec())
-                .when()
-                .pathParam("id", idForCreatedEntry)
-                .body(new Entry("New Entry Name", EntryCategory.JAVA, new URL("http://www.new-url.de")))
-                .filter(document("update-specific-entry",
-                        preprocessResponse(prettyPrint()),
-                        pathParameters(parameterWithName("id").description("The ID of an entry"))))
-                .contentType(ContentType.JSON)
-                .put("entries/{id}")
-                .then()
-                .statusCode(200)
-                .body("id", any(String.class))
-                .body("name", is("New Entry Name"))
-                .body("category", is("JAVA"))
-                .body("url", is("http://www.new-url.de"));
-
+        webTestClient
+                .delete()
+                .uri("/entries")
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
     }
 
-    private String getIdForCreatedEntry() throws MalformedURLException {
-        entry = new Entry(LINUX_WASCHMITTEL, EntryCategory.LINUX, new URL("https://de.wikipedia.org/wiki/Linux_(Waschmittel)"));
-        return given(getPlainRequestSpec())
-                .when()
-                .body(entry)
-                .contentType(ContentType.JSON)
-                .post("entries")
-                .then()
-                .statusCode(201)
-                .extract()
-                .header(HttpHeaders.LOCATION);
-    }
-
-    @BeforeMethod(alwaysRun = true)
-    public void setUp(Method method) {
-        restDocumentation.beforeTest(getClass(), method.getName());
-    }
-
-    @AfterMethod(alwaysRun = true)
-    public void tearDown() {
-        restDocumentation.afterTest();
+    public String getIdForCreatedEntry() {
+        return Objects.requireNonNull(
+                webTestClient
+                        .post()
+                        .uri("/entries")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .body(Mono.just(entry), Entry.class)
+                        .exchange()
+                        .returnResult(Entry.class)
+                        .getResponseHeaders().getLocation())
+                .toString();
     }
 }

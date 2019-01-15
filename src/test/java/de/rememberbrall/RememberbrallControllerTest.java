@@ -5,10 +5,10 @@ import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -63,7 +63,7 @@ public class RememberbrallControllerTest {
         StepVerifier.create(specificEntry)
                 .expectNextMatches(responseEntity ->
                         responseEntity.getStatusCode() == (HttpStatus.OK)
-                                && responseEntity.getBody().getId().equals(ID_EXAMPLE))
+                                && Objects.requireNonNull(responseEntity.getBody()).getId().equals(ID_EXAMPLE))
                 .verifyComplete();
     }
 
@@ -94,7 +94,8 @@ public class RememberbrallControllerTest {
         StepVerifier.create(newEntry)
                 .expectNextMatches(responseEntity ->
                         responseEntity.getStatusCode() == (HttpStatus.CREATED) &&
-                                responseEntity.getHeaders().getLocation().getPath().equals(ID_EXAMPLE))
+                                Objects.requireNonNull(responseEntity.getHeaders().getLocation())
+                                        .getPath().equals(ID_EXAMPLE))
                 .verifyComplete();
     }
 
@@ -103,7 +104,7 @@ public class RememberbrallControllerTest {
         //given
         when(rememberbrallService.deleteEntry(ID_EXAMPLE)).thenReturn(Mono.empty());
         //when
-        Mono<ServerResponse> deleteEntry = rememberbrallController.deleteEntry(ID_EXAMPLE);
+        Mono<ResponseEntity<Void>> deleteEntry = rememberbrallController.deleteEntry(ID_EXAMPLE);
         //then
         StepVerifier.create(deleteEntry)
                 .verifyComplete();
@@ -115,7 +116,7 @@ public class RememberbrallControllerTest {
         //given
         when(rememberbrallService.deleteAllEntries()).thenReturn(Mono.empty());
         //when
-        Mono<ServerResponse> deleteAllEntries = rememberbrallController.deleteAllEntries();
+        Mono<ResponseEntity<Void>> deleteAllEntries = rememberbrallController.deleteAllEntries();
         //then
         StepVerifier.create(deleteAllEntries)
                 .verifyComplete();

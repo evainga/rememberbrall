@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.server.ServerResponse;
 
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -57,15 +56,17 @@ public class RememberbrallController {
     }
 
     @DeleteMapping("/entries")
-    public Mono<ServerResponse> deleteAllEntries() {
+    public Mono<ResponseEntity<Void>> deleteAllEntries() {
         return rememberbrallService.deleteAllEntries()
-                .flatMap(aVoid -> ServerResponse.noContent().build());
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.noContent().build());
     }
 
     @DeleteMapping("/entries/{id}")
-    public Mono<ServerResponse> deleteEntry(@PathVariable String id) {
+    public Mono<ResponseEntity<Void>> deleteEntry(@PathVariable String id) {
         return rememberbrallService.deleteEntry(id)
-                .flatMap(aVoid -> ServerResponse.noContent().build());
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.noContent().build());
     }
 
     @PutMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
