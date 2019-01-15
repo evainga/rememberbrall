@@ -107,6 +107,7 @@ public class RememberbrallControllerTest {
         Mono<ResponseEntity<Void>> deleteEntry = rememberbrallController.deleteEntry(ID_EXAMPLE);
         //then
         StepVerifier.create(deleteEntry)
+                .expectNextMatches(responseEntity -> responseEntity.getStatusCode().equals(HttpStatus.NO_CONTENT))
                 .verifyComplete();
 
     }
@@ -119,6 +120,7 @@ public class RememberbrallControllerTest {
         Mono<ResponseEntity<Void>> deleteAllEntries = rememberbrallController.deleteAllEntries();
         //then
         StepVerifier.create(deleteAllEntries)
+                .expectNextMatches(responseEntity -> responseEntity.getStatusCode().equals(HttpStatus.NO_CONTENT))
                 .verifyComplete();
     }
 
