@@ -13,16 +13,18 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    private static final String ADMIN_ROLE = "ADMIN_ROLE";
+    static final String ADMIN = "ADMIN";
+    private static final String PASSWORD_ADMIN = "{bcrypt}$2a$10$0p3peMKEhXSXEOS6D/Zk9epnMtGymuq4i6duWJFu6SuoW.kHVDEKO";
+    private static final String USERNAME_ADMIN = "admin";
 
     @Bean
     public MapReactiveUserDetailsService userDetailsService() {
-        UserDetails user = User
-                .withUsername("admin")
-                .password("{bcrypt}$2a$10$0p3peMKEhXSXEOS6D/Zk9epnMtGymuq4i6duWJFu6SuoW.kHVDEKO")
-                .roles(ADMIN_ROLE)
+        UserDetails admin = User
+                .withUsername(USERNAME_ADMIN)
+                .password(PASSWORD_ADMIN)
+                .roles(ADMIN)
                 .build();
-        return new MapReactiveUserDetailsService(user);
+        return new MapReactiveUserDetailsService(admin);
     }
 
     @Bean
@@ -30,7 +32,7 @@ public class SecurityConfig {
         return http
                 .csrf().disable()
                 .authorizeExchange()
-                .pathMatchers(HttpMethod.DELETE, "/entries").hasRole(ADMIN_ROLE)
+                .pathMatchers(HttpMethod.DELETE, "/entries").hasRole(ADMIN)
                 .anyExchange().permitAll()
                 .and().httpBasic()
                 .and().formLogin()
