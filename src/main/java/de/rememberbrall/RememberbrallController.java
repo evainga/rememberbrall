@@ -1,10 +1,10 @@
 package de.rememberbrall;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.AllArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@AllArgsConstructor
 public class RememberbrallController {
 
-    @Autowired
     private RememberbrallService rememberbrallService;
 
     @TrackTime
@@ -30,49 +31,50 @@ public class RememberbrallController {
         return rememberbrallService.getAllEntries();
     }
 
-    @TrackTime
-    @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Entry> showSpecificEntry(@PathVariable String id) {
-        Mono<Entry> mono = rememberbrallService.getEntryByID(id);
-
-        if (mono.hasElement().block()) {
-            return ResponseEntity.ok(mono.block());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
     @PostMapping("/entries")
-    public ResponseEntity<Entry> createEntry(@Valid @RequestBody Entry entry) {
-        String id = rememberbrallService.createEntry(entry).block().getId();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, id);
-        return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    public Mono<ResponseEntity<Entry>> createEntry(@Valid @RequestBody Entry entry) {
+
+        return rememberbrallService.createEntry(entry)
+                .map(Entry::getId)
+                .flatMap(id -> {
+                    try {
+                        return Mono.just(ResponseEntity.created(new URI(id)).build());
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                    return Mono.empty();
+                });
+    }
+
+    @TrackTime
+    @GetMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Mono<ResponseEntity<Entry>> showSpecificEntry(@PathVariable String id) {
+        return rememberbrallService.getEntryByID(id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/entries")
-    public ResponseEntity<?> deleteAllEntries() {
-        rememberbrallService.deleteAllEntries().block();
-        return ResponseEntity.noContent().build();
+    public Mono<ResponseEntity<Void>> deleteAllEntries() {
+        return rememberbrallService.deleteAllEntries()
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.noContent().build());
     }
 
     @DeleteMapping("/entries/{id}")
-    public ResponseEntity<?> deleteEntry(@PathVariable String id) {
-        rememberbrallService.deleteEntry(id).block();
-        return ResponseEntity.noContent().build();
+    public Mono<ResponseEntity<Void>> deleteEntry(@PathVariable String id) {
+        return rememberbrallService.deleteEntry(id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.noContent().build());
     }
 
     @PutMapping(path = "/entries/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Entry> updateEntry(
-            @PathVariable String id,
+    public Mono<ResponseEntity<Entry>> updateEntry(@PathVariable String id,
             @RequestBody Entry entry) {
 
-        Mono<Entry> updateEntry = rememberbrallService.updateEntry(id, entry);
-
-        if (updateEntry.hasElement().block()) {
-            return ResponseEntity.ok(updateEntry.block());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return rememberbrallService.updateEntry(id, entry)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }

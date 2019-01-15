@@ -1,14 +1,12 @@
 package de.rememberbrall;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.testng.annotations.BeforeTest;
@@ -20,19 +18,23 @@ import reactor.test.StepVerifier;
 
 public class RememberbrallControllerTest {
 
-    @InjectMocks
     private RememberbrallController rememberbrallController;
-    @Mock
-    private RememberbrallService rememberbrallService;
-    @Mock
+
+    private RememberbrallService rememberbrallService = mock(RememberbrallService.class);
+
     private Entry entry;
+    private Entry entryWithId;
 
 
-    private static final String ID_EXAMPLE = "00000000-0000-0000-0000-000000000002";
+    private static final String ID_EXAMPLE = "00000000-0000-0000-0000-000000000001";
 
     @BeforeTest
-    public void initMocks() {
-        MockitoAnnotations.initMocks(this);
+    public void init() throws MalformedURLException {
+        rememberbrallController = new RememberbrallController(rememberbrallService);
+        entry = new Entry("Rekursion in Java", EntryCategory.JAVA,
+                new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
+        entryWithId = new Entry(ID_EXAMPLE, "Rekursion in Java", EntryCategory.JAVA,
+                new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
     }
 
     @Test
@@ -52,13 +54,17 @@ public class RememberbrallControllerTest {
     @Test
     public void showSpecificExistingEntry() {
         //given
-        when(rememberbrallService.getEntryByID(ID_EXAMPLE)).thenReturn(Mono.just(entry));
+        when(rememberbrallService.getEntryByID(ID_EXAMPLE)).thenReturn(Mono.just(entryWithId));
 
         //when
-        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(ID_EXAMPLE);
+        Mono<ResponseEntity<Entry>> specificEntry = rememberbrallController.showSpecificEntry(ID_EXAMPLE);
 
         //then
-        assertThat(specificEntry.getBody()).isEqualTo(entry);
+        StepVerifier.create(specificEntry)
+                .expectNextMatches(responseEntity ->
+                        responseEntity.getStatusCode() == (HttpStatus.OK)
+                                && Objects.requireNonNull(responseEntity.getBody()).getId().equals(ID_EXAMPLE))
+                .verifyComplete();
     }
 
     @Test
@@ -67,25 +73,30 @@ public class RememberbrallControllerTest {
         when(rememberbrallService.getEntryByID(ID_EXAMPLE)).thenReturn(Mono.empty());
 
         //when
-        ResponseEntity<Entry> specificEntry = rememberbrallController.showSpecificEntry(ID_EXAMPLE);
+        Mono<ResponseEntity<Entry>> specificEntry = rememberbrallController.showSpecificEntry(ID_EXAMPLE);
 
         //then
-        assertThat(specificEntry.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        StepVerifier.create(specificEntry)
+                .expectNextMatches(responseEntity -> responseEntity.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                .verifyComplete();
+
     }
 
     @Test
     public void createEntry() {
         //given
-        Mono<Entry> entryAsMono = Mono.just(entry);
-        when(rememberbrallService.createEntry(entry)).thenReturn(entryAsMono);
-        when(entryAsMono.block().getId()).thenReturn(ID_EXAMPLE);
+        when(rememberbrallService.createEntry(entry)).thenReturn(Mono.just(entryWithId));
 
         //when
-        ResponseEntity<Entry> newEntry = rememberbrallController.createEntry(entry);
+        Mono<ResponseEntity<Entry>> newEntry = rememberbrallController.createEntry(entry);
 
         //then
-        assertThat(newEntry.getStatusCode()).isSameAs(HttpStatus.CREATED);
-        assertThat(newEntry.getHeaders().getLocation().toString()).isEqualTo(ID_EXAMPLE);
+        StepVerifier.create(newEntry)
+                .expectNextMatches(responseEntity ->
+                        responseEntity.getStatusCode() == (HttpStatus.CREATED) &&
+                                Objects.requireNonNull(responseEntity.getHeaders().getLocation())
+                                        .getPath().equals(ID_EXAMPLE))
+                .verifyComplete();
     }
 
     @Test
@@ -93,9 +104,12 @@ public class RememberbrallControllerTest {
         //given
         when(rememberbrallService.deleteEntry(ID_EXAMPLE)).thenReturn(Mono.empty());
         //when
-        ResponseEntity<?> deleteEntry = rememberbrallController.deleteEntry(ID_EXAMPLE);
+        Mono<ResponseEntity<Void>> deleteEntry = rememberbrallController.deleteEntry(ID_EXAMPLE);
         //then
-        assertThat(deleteEntry.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        StepVerifier.create(deleteEntry)
+                .expectNextMatches(responseEntity -> responseEntity.getStatusCode().equals(HttpStatus.NO_CONTENT))
+                .verifyComplete();
+
     }
 
     @Test
@@ -103,9 +117,11 @@ public class RememberbrallControllerTest {
         //given
         when(rememberbrallService.deleteAllEntries()).thenReturn(Mono.empty());
         //when
-        ResponseEntity<?> deleteAllEntries = rememberbrallController.deleteAllEntries();
+        Mono<ResponseEntity<Void>> deleteAllEntries = rememberbrallController.deleteAllEntries();
         //then
-        assertThat(deleteAllEntries.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        StepVerifier.create(deleteAllEntries)
+                .expectNextMatches(responseEntity -> responseEntity.getStatusCode().equals(HttpStatus.NO_CONTENT))
+                .verifyComplete();
     }
 
     @Test
@@ -114,10 +130,12 @@ public class RememberbrallControllerTest {
         when(rememberbrallService.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")))).thenReturn(Mono.just(entry));
 
         //when
-        ResponseEntity<Entry> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")));
+        Mono<ResponseEntity<Entry>> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")));
 
         //then
-        assertThat(updatedEntry.getStatusCode()).isSameAs(HttpStatus.OK);
+        StepVerifier.create(updatedEntry)
+                .expectNextMatches(responseEntity -> responseEntity.getStatusCode().equals(HttpStatus.OK))
+                .verifyComplete();
     }
 
     @Test
@@ -126,10 +144,12 @@ public class RememberbrallControllerTest {
         when(rememberbrallService.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")))).thenReturn(Mono.empty());
 
         //when
-        ResponseEntity<Entry> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")));
+        Mono<ResponseEntity<Entry>> updatedEntry = rememberbrallController.updateEntry(ID_EXAMPLE, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")));
 
         //then
-        assertThat(updatedEntry.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        StepVerifier.create(updatedEntry)
+                .expectNextMatches(responseEntity -> responseEntity.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                .verifyComplete();
     }
 
 }

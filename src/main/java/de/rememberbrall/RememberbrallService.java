@@ -32,18 +32,18 @@ public class RememberbrallService {
         return entryRepository.deleteAll();
     }
 
-    public Mono<Entry> updateEntry(String id, Entry entry) {
-        Mono<Entry> entryById = entryRepository.findById(id);
-
-        if (entryById.equals(Mono.empty())) {
-            return entryById;
+    public Mono<Entry> updateEntry(String id, Entry updatedEntry) {
+        Mono<Entry> existingEntry = entryRepository.findById(id);
+        if (existingEntry.equals(Mono.empty())) {
+            return existingEntry;
         } else {
-            Entry newEntry = entryById.block();
-            newEntry.setName(entry.getName());
-            newEntry.setUrl(entry.getUrl());
-            newEntry.setCategory(entry.getCategory());
-            return entryRepository.save(newEntry);
+            return existingEntry
+                    .flatMap(entry -> {
+                        entry.setName(updatedEntry.getName());
+                        entry.setCategory(updatedEntry.getCategory());
+                        entry.setUrl(updatedEntry.getUrl());
+                        return entryRepository.save(entry);
+                    });
         }
     }
-
 }

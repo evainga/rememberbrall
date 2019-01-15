@@ -22,13 +22,13 @@ This documentation is done with https://github.com/rest-assured/rest-assured[Res
 
 This endpoint provides all entries of Rememberbrall.
 
-operation::show-entries[snippets='curl-request,http-request,http-response,response-fields']
+operation::get-all-entries[snippets='curl-request,http-request,http-response,response-fields']
 
 == Get a specific entry
 
-This endpoint gets a specific entry of Rememberbrall. 
+This endpoint gets a specific entry of Rememberbrall.
 
-operation::show-specific-entry[snippets='curl-request,http-request,http-response,response-fields'] 
+operation::get-specific-entry[snippets='curl-request,http-request,http-response,response-fields']
 
 == Create an entry
 This endpoint creates an entry to Rememberbrall.
@@ -45,7 +45,7 @@ operation::delete-non-existing-entry[snippets='curl-request,http-request,http-re
 
 === Delete a newly created entry
 
-operation::delete-newly-created-entry[snippets='curl-request,http-request,http-response']
+operation::delete-created-entry[snippets='curl-request,http-request,http-response']
 
 == Delete all entries
 
@@ -53,5 +53,5 @@ operation::delete-all-entries[snippets='curl-request,http-request,http-response'
 
 == Update an entry
 
-operation::update-specific-entry[snippets='curl-request,path-parameters,http-request,http-response']
+operation::update-specific-entry[snippets='curl-request,request-fields,http-request,http-response']
 

@@ -170,17 +170,24 @@ public class RememberbrallServiceTest extends MockitoTest {
     @Test
     public void updateEntryCompletely() throws MalformedURLException {
         //given
-        Entry entry = new Entry(ENTRY_ID, "Rekursion in Java", EntryCategory.JAVA,
+        Entry existingEntry = new Entry(ENTRY_ID, "Rekursion in Java", EntryCategory.JAVA,
                 new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
-        when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(entry));
+
+        String newEntryName = "New Entry Name";
+        URL newUrl = new URL("http://www.new-url.de");
+        Entry newEntryContent = new Entry(newEntryName, EntryCategory.LINUX, newUrl);
+        Entry entryWithOldIdAndNewContent = new Entry(ENTRY_ID, newEntryName, EntryCategory.LINUX, newUrl);
+
+        when(entryRepository.findById(ENTRY_ID)).thenReturn(Mono.just(existingEntry));
+        when(entryRepository.save(entryWithOldIdAndNewContent)).thenReturn(Mono.just(entryWithOldIdAndNewContent));
 
         //when
-        rememberbrallService.updateEntry(ENTRY_ID, new Entry("New Entry Name", EntryCategory.LINUX, new URL("http://www.new-url.de")));
+        Mono<Entry> newEntry = rememberbrallService.updateEntry(ENTRY_ID, newEntryContent);
 
         //then
-        assertThat(entry.getName()).isEqualTo("New Entry Name");
-        assertThat(entry.getUrl()).isEqualTo(new URL("http://www.new-url.de"));
-        assertThat(entry.getCategory()).isEqualTo(EntryCategory.LINUX);
+        StepVerifier.create(newEntry)
+                .expectNextMatches(entryWithOldIdAndNewContent::equals)
+                .verifyComplete();
     }
 
     @Test
