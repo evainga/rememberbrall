@@ -1,41 +1,31 @@
 package de.rememberbrall;
 
-import static io.restassured.RestAssured.given;
-
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.Test;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.specification.RequestSpecification;
 
+@SpringBootTest
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = RememberbrallApplication.class)
 @AutoConfigureWebTestClient
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = RememberbrallApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-public class ThymeleafControllerIT extends AbstractTestNGSpringContextTests {
+public class ThymeleafControllerIT {
 
-
-    @Value("${local.server.port}")
-    private int port;
-
-    public RequestSpecification getPlainRequestSpec() {
-        return new RequestSpecBuilder()
-                .build()
-                .baseUri("http://localhost")
-                .port(port);
-    }
+    @Autowired
+    private WebTestClient webTestClient;
 
     @Test
     public void showAllEventsStatusCode() {
-        given(getPlainRequestSpec())
-                .when()
-                .get("thymeleaf-entries")
-                .then()
-                .statusCode(200);
+        webTestClient
+                .get()
+                .uri("/thymeleaf-entries")
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 }
