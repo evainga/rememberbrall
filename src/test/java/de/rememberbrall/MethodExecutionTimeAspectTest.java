@@ -1,6 +1,7 @@
 package de.rememberbrall;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,10 +10,9 @@ import java.util.stream.Collectors;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -23,19 +23,21 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MethodExecutionTimeAspectTest extends MockitoTest {
+public class MethodExecutionTimeAspectTest {
 
 
     private static final String JOIN_POINT = "joinPoint";
 
-    @InjectMocks
     MethodExecutionTimeAspect aspect;
-    @Mock
-    private ProceedingJoinPoint joinPoint;
-    @Mock
-    private Signature signature;
-    @Mock
-    private Object object;
+
+    private final ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+    private final Signature signature = mock(Signature.class);
+    private final Object object = new Object();
+
+    @Before
+    public void setup() {
+        aspect = new MethodExecutionTimeAspect();
+    }
 
     @Test
     public void verifyProceedHasBeenCalledAndObjectReturned() throws Throwable {
@@ -50,7 +52,7 @@ public class MethodExecutionTimeAspectTest extends MockitoTest {
 
         //Then
         verify(joinPoint).proceed();
-        assertThat(returnObject.toString()).isEqualTo("object");
+        assertThat(returnObject).isEqualTo(object);
     }
 
     @Test

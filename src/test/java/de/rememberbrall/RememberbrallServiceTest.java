@@ -2,21 +2,20 @@ package de.rememberbrall;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public class RememberbrallServiceTest extends MockitoTest {
+public class RememberbrallServiceTest {
 
     private static final String ENTRY_ID = "00000000-0000-0000-0000-000000000001";
     private static final String ENTRY_ID_2 = "00000000-0000-0000-0000-000000000002";
@@ -24,19 +23,19 @@ public class RememberbrallServiceTest extends MockitoTest {
     private Entry entry;
     private Entry entry2;
 
-    @InjectMocks
     private RememberbrallService rememberbrallService;
 
-    @Mock
-    private EntryRepository entryRepository;
+    private final EntryRepository entryRepository = mock(EntryRepository.class);
 
 
-    @BeforeTest
+    @Before
     public void createInitialEntries() throws MalformedURLException {
         entry = new Entry(ENTRY_ID, "Rekursion in Java", EntryCategory.JAVA,
                 new URL("http://www.java-programmieren.com/rekursion-in-java.php"));
         entry2 = new Entry(ENTRY_ID_2, "Reactive Testing", EntryCategory.ENTWICKLUNG,
                 new URL("http://projectreactor.io/docs/core/release/reference/docs/index.html#testing"));
+
+        rememberbrallService = new RememberbrallService(entryRepository);
     }
 
 

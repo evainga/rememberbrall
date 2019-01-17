@@ -1,30 +1,27 @@
 package de.rememberbrall;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.ui.Model;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.ui.Model;
+
 import reactor.core.publisher.Flux;
 
 public class ThymeleafControllerTest {
 
-    @InjectMocks
     private ThymeleafController thymeleafController;
-    @Mock
-    private RememberbrallService rememberbrallService;
-    @Mock
-    private Entry entry;
-    @Mock
-    private Model model;
 
-    @BeforeTest
+    private final RememberbrallService rememberbrallService = mock(RememberbrallService.class);
+    private final Entry entry = mock(Entry.class);
+    private final Model model = mock(Model.class);
+
+    @Before
     public void initMocks() {
-        MockitoAnnotations.initMocks(this);
+        thymeleafController = new ThymeleafController(rememberbrallService);
+
     }
 
     //    @Test

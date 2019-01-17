@@ -2,20 +2,20 @@ package de.rememberbrall;
 
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.spring5.context.webflux.IReactiveDataDriverContextVariable;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
+import lombok.AllArgsConstructor;
 import reactor.core.publisher.Flux;
 
 @Controller
+@AllArgsConstructor
 public class ThymeleafController {
 
-    @Autowired
-    private RememberbrallService rememberbrallService;
+    private final RememberbrallService rememberbrallService;
 
     //        @GetMapping(path = "/")
     //        public ModelAndView forwardToRestDocumentation() {

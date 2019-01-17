@@ -7,10 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,7 +28,7 @@ public class RememberbrallControllerTest {
 
     private static final String ID_EXAMPLE = "00000000-0000-0000-0000-000000000001";
 
-    @BeforeTest
+    @Before
     public void init() throws MalformedURLException {
         rememberbrallController = new RememberbrallController(rememberbrallService);
         entry = new Entry("Rekursion in Java", EntryCategory.JAVA,

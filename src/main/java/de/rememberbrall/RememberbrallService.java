@@ -1,16 +1,16 @@
 package de.rememberbrall;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.AllArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
+@AllArgsConstructor
 public class RememberbrallService {
 
-    @Autowired
-    private EntryRepository entryRepository;
+    private final EntryRepository entryRepository;
 
     public Flux<Entry> getAllEntries() {
         return entryRepository.findAll();

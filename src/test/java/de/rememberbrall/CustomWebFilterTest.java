@@ -1,25 +1,23 @@
 package de.rememberbrall;
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
-import org.springframework.mock.web.server.MockServerWebExchange;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilterChain;
-import org.testng.annotations.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilterChain;
+
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public class CustomWebFilterTest extends MockitoTest {
+public class CustomWebFilterTest {
 
-    @InjectMocks
-    private CustomWebFilter customWebFilter;
-
+    private CustomWebFilter customWebFilter = new CustomWebFilter();
 
     @Test
     public void filterForRootUrl() {
