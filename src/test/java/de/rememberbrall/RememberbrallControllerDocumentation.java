@@ -147,7 +147,7 @@ public class RememberbrallControllerDocumentation {
 
         webTestClient
                 .get()
-                .uri("entries")
+                .uri("/entries")
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .exchange()
                 .expectStatus()

@@ -27,7 +27,7 @@ public class ThymeleafController {
     public String showAllEntries(final Model model) {
         final Flux<Entry> entryStream = this.rememberbrallService.getAllEntries().delayElements(Duration.ofMillis(50));
         final IReactiveDataDriverContextVariable entryDriver = new ReactiveDataDriverContextVariable(entryStream, 1, 1);
-        model.addAttribute("entries", entryDriver);
+        model.addAttribute("/entries", entryDriver);
         return "thymeleaf-entries";
     }
 
