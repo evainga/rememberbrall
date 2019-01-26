@@ -12,5 +12,5 @@ after_success:
 services: mongodb
 
 jdk:
-- oraclejdk8
+- openjdk11
 
