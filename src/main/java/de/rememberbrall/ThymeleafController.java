@@ -9,10 +9,11 @@ import org.thymeleaf.spring5.context.webflux.IReactiveDataDriverContextVariable;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
 @Controller
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ThymeleafController {
 
     private final RememberbrallService rememberbrallService;
