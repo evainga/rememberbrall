@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.spring5.context.webflux.IReactiveDataDriverContextVariable;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
